@@ -1,0 +1,21 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{87DD2BBE-E72A-4D6C-B3CE-BF03946070B6}</ProjectGuid>
+    <MainSource>ValidateXmlExample.dpr</MainSource>
+    <ProjectName>ValidateXmlExample</ProjectName>
+    <ProjectVersion>19.0</ProjectVersion>
+    <FrameworkType>None</FrameworkType>
+    <AppType>Console</AppType>
+    <Base>true</Base>
+    <Config Condition="'$(Config)'==''">Release</Config>
+    <Platform Condition="'$(Platform)'==''">Win64</Platform>
+    <TargetedPlatforms>2</TargetedPlatforms>
+    <DCC_Namespace>System;Xml;Winapi;$(DCC_Namespace)</DCC_Namespace>
+    <DCC_UnitSearchPath>..\Source</DCC_UnitSearchPath>
+    <DCC_ExeOutput>..\build</DCC_ExeOutput>
+    <DCC_DcuOutput>..\build\obj\ValidateXmlExample</DCC_DcuOutput>
+    <DCC_DebugInformation>0</DCC_DebugInformation>
+  </PropertyGroup>
+  <ItemGroup><DelphiCompile Include="$(MainSource)"><MainSource>MainSource</MainSource></DelphiCompile></ItemGroup>
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" />
+</Project>

@@ -1,0 +1,4 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="urn:mggm:kosit:test:local" targetNamespace="urn:mggm:kosit:test:local" elementFormDefault="qualified">
+  <xs:include schemaLocation="parts/local-types.xsd"/>
+  <xs:element name="code" type="local:LocalCode"/>
+</xs:schema>

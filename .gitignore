@@ -1,0 +1,12 @@
+Build/
+/Runtime/
+/Evidence/
+/build/
+/Tests/build/
+/Validation/
+/Vendor/
+/__pycache__/
+**/__pycache__/
+*.res
+*.dproj.local
+*.identcache

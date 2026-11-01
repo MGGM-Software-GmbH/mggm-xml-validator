@@ -1,0 +1,6 @@
+# Die KoSIT-Originalbytes bleiben auch bei Windows-Checkouts unverändert.
+Source/scenarios.xsd -text
+Source/createReportInput.xsd -text
+Source/svrl-kosit.xsd -text
+Source/xml.xsd -text
+Source/identity.xsl -text

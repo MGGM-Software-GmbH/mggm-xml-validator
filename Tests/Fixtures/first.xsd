@@ -1,0 +1,3 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:mggm:kosit:test:pair" elementFormDefault="qualified">
+  <xs:element name="first" type="xs:string"/>
+</xs:schema>

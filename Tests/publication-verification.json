@@ -1,0 +1,277 @@
+{
+  "checked_at": "2026-11-01T17:50:23.666355+00:00",
+  "toolchain": {
+    "compiler": "Delphi 11 Alexandria",
+    "platform": "Win64",
+    "server_version": "2.8.0.8"
+  },
+  "builds": [
+    {
+      "project": "MGGMXmlValidator",
+      "configuration": "Release",
+      "platform": "Win64",
+      "build_id": "{4F4FDFD3-96D6-4D69-8296-978C7A065ABA}",
+      "sha256": "fc3be0501b39632524dac48955c67cc338bec2b4ff1846902dc62d0c8d913feb",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "MGGMXmlValidatorBatch",
+      "configuration": "Release",
+      "platform": "Win64",
+      "build_id": "{C7DFB7FF-CFBA-44D8-BECE-226ABF911929}",
+      "sha256": "800350e9e4357a682d928bd3c8237d6004d1e7fd7b7126154acb0903ea4fd412",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "ValidateXmlExample",
+      "configuration": "Release",
+      "platform": "Win64",
+      "build_id": "{7632FD5E-EC31-4376-9024-AD781EC7BB6B}",
+      "sha256": "40c4e26697a76b74811578a64c41d36bc7d2e114eec053eaf502c2b59b4458c5",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "EngineTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{2C4FD8E2-13DF-4898-9030-43B054E8E4AA}",
+      "sha256": "3e4fb1dd73b1118e3919a77b048f6b41e1a40047ace495bf08dc6d56d8fc3605",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "PipelineTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{5B501CE5-B488-40C4-BCED-321AE45AC556}",
+      "sha256": "267209dad19dafcd099d925735eb392a4060c256265edabd1177ca04abd8e9b9",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "CliTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{A4F5C674-AE38-4138-8951-65AEBCF1EF9C}",
+      "sha256": "f68701dc4634b67974cf8eeb1d2c47ae2e79a7ec9ca4a7668a902b63b120caf5",
+      "warnings": []
+    },
+    {
+      "project": "StreamAdapterTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{0F4B6840-867A-4FF1-AB99-CB5CDC7FDA2F}",
+      "sha256": "64cf47c0f499fb5ce08fd432b7dab3a28a60afdceeaeeb2e6b20e68d45a76550",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "NativeReuseTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{A690FF1E-C286-4264-8DB0-314D1CEDBCAA}",
+      "sha256": "c3daf8f14d501e840b50c431fb9b41d3e3f732cddc0d3127ca63346177b55bed",
+      "warnings": []
+    },
+    {
+      "project": "MemoryTransferTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{E6428248-EAB0-4578-8006-521DA5602784}",
+      "sha256": "479831c5c06d5982d116a97c9a7ec0147182d95128135f8b6cd421aeef3667bd",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "ParallelEngineTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{07534EF4-F6EA-4AA0-9333-8045E9051D28}",
+      "sha256": "f31978d619270ec8cd4e55d4c4634c7efe5d65cb464088750d22121a84668ec2",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "DelphiExampleTests",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{6080CAE0-FA2D-46E5-B32B-FBC59195C293}",
+      "sha256": "ff16723c4141ba1340d04cec855f8a953ca386bc14d46fe2289668d708a6a687",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "BenchmarkRuns",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{B3C3771C-49D8-46A4-B689-8190BB8014FE}",
+      "sha256": "1e8f527ab6b954392fbad5298f0abce235fa6a6efc328070f651d4d561ee5cbe",
+      "warnings": []
+    }
+  ],
+  "delphi_tests": [
+    {
+      "program": "EngineTests",
+      "run_id": "22398A2C-B6C2-40B7-BC6B-E8201330D386",
+      "exit_code": 0,
+      "passed": 38,
+      "total": 38
+    },
+    {
+      "program": "PipelineTests",
+      "run_id": "F9FBB8C3-ED54-45EB-B97C-125242078FDA",
+      "exit_code": 0,
+      "passed": 16,
+      "total": 16
+    },
+    {
+      "program": "CliTests",
+      "run_id": "D87A10F2-E9E4-4BAA-803A-13A58FC1CEC6",
+      "exit_code": 0,
+      "passed": 16,
+      "total": 16
+    },
+    {
+      "program": "StreamAdapterTests",
+      "run_id": "5E77FEED-47EA-4913-8411-1E766C0E4461",
+      "exit_code": 0,
+      "passed": 4,
+      "total": 4
+    },
+    {
+      "program": "NativeReuseTests",
+      "run_id": "182601B1-8CAC-43E4-93DF-1189AE2CA43C",
+      "exit_code": 0,
+      "passed": 20,
+      "total": 20
+    },
+    {
+      "program": "MemoryTransferTests",
+      "run_id": "DB9A0EFB-4CC9-4753-B056-BA61E6337430",
+      "exit_code": 0,
+      "passed": 14,
+      "total": 14
+    },
+    {
+      "program": "ParallelEngineTests",
+      "run_id": "0107415B-1CDD-4CA1-AC05-36B030679620",
+      "exit_code": 0,
+      "passed": true,
+      "validation_calls": 16,
+      "overlapping_rounds": 8
+    },
+    {
+      "program": "DelphiExampleTests",
+      "run_id": "EFF3883E-7713-46AD-A16D-D9A623BF4C36",
+      "exit_code": 0,
+      "passed": 17,
+      "total": 17
+    }
+  ],
+  "python_tests": {
+    "passed": 81,
+    "total": 81,
+    "exit_code": 0
+  },
+  "package": {
+    "manifest_files": 240,
+    "rule_files": 219,
+    "manifest_hash_mismatches": 0,
+    "original_rule_byte_mismatches": 0,
+    "longest_tested_rule_path_characters": 280
+  },
+  "framework_resources": {
+    "scenarios.xsd": "3990b4386b8939cb3bba92b96047238c9465402eaed10f2735fb7d9275525321",
+    "createReportInput.xsd": "73fb6e16c6f015e403f580722e83acad23c478aab0d46fd8469f9d45425ba2d9",
+    "svrl-kosit.xsd": "4612bb8731fedaaacd50173b0966cccff0cc521e6eb4488222d7758642e146ad",
+    "xml.xsd": "a0149f651e68f4b81399b3125a8168198b4acbedfa3268461c0ba4e6d517c400",
+    "identity.xsl": "cacbff8cd3ad97c3164d919cfdee3664042610d7ad61f9ecebc4858a369002cc"
+  },
+  "corpus_regression": {
+    "passed": 23,
+    "total": 23,
+    "comparison": "Aktuelle Berichtsignaturen gegenüber dem gesicherten Vergleichsbestand; kein erneuter Java-Lauf.",
+    "batch_run_id": "7D0F5163-7929-4B30-ABC9-E79978ED26DA",
+    "batch_exit_code": 9,
+    "expected_rejections_or_errors": 9
+  },
+  "counterprobes": {
+    "long_path_without_win32_prefix": "Langpfadprüfung schlägt fehl; Präfix anschließend wiederhergestellt.",
+    "schema_redefinition": {
+      "passed_before_fix": 30,
+      "failed_before_fix": 6,
+      "run_id": "51463D7E-6EAB-45DA-97D3-3EE2A14D206D"
+    },
+    "local_prefix_shadowing": {
+      "passed_before_fix": 36,
+      "failed_before_fix": 2,
+      "run_id": "8A9200E6-A7DC-41A2-B114-08EB795B39DD"
+    },
+    "cmd_default_output": {
+      "passed_before_fix": 16,
+      "failed_before_fix": 1,
+      "run_id": "37F61FF0-EDFE-4F43-8AF7-FE7D5A27FCBC"
+    },
+    "cli_identity": {
+      "passed_before_fix": 15,
+      "failed_before_fix": 1,
+      "run_id": "F2B92910-BB95-4780-B3E8-2A14D822D8CD"
+    },
+    "report_identity": {
+      "passed_before_fix": 0,
+      "failed_before_fix": 16,
+      "run_id": "0150D526-E0DE-49D8-915B-5B2A15779482"
+    }
+  },
+  "source_export": {
+    "source_files_including_this_proof": 80,
+    "source_byte_mismatches": 0,
+    "product_reference_matches": 0,
+    "git_metadata": false,
+    "binary_artifacts": 0,
+    "python_tests_passed": 81,
+    "builds": [
+      {
+        "project": "MGGMXmlValidator",
+        "build_id": "{92CB8ADE-2339-4045-BB2C-0C48B85D17DB}",
+        "sha256": "e839b071eefb571d09f15443773d29b93e3bcf46db00a11e7a8242205430d2f9"
+      },
+      {
+        "project": "MGGMXmlValidatorBatch",
+        "build_id": "{4D4EA2D3-2332-4B70-B692-3F78BC7B41CF}",
+        "sha256": "06fcf7500b128d4ec4240cf2741097bdb7412ef279ef6d64dd8985a712b5cdf4"
+      },
+      {
+        "project": "ValidateXmlExample",
+        "build_id": "{F4E3A8B9-44D9-493C-A75B-CAA24C2DB022}",
+        "sha256": "fd0333cb5006c2f6fb633db6cca8b357772603e4222e72b3a82956be79921771"
+      }
+    ],
+    "cli_run_id": "835F9812-6E0E-4670-87AD-237C78BB2832",
+    "cli_exit_code": 0
+  },
+  "limits": [
+    "Win32, weitere Delphi-Versionen und ein Rechner ohne Entwicklungswerkzeuge wurden nicht geprüft.",
+    "Paketierung prüft Dateien und Hashes; tatsächliche Validierungsläufe prüfen die Verwendbarkeit der Regelpakete.",
+    "Die genaue Quellcodezuordnung und ergänzende Laufzeithinweise für SaxonC-HE 12.10.1 bleiben vor externer Binärweitergabe zu klären."
+  ],
+  "publication": {
+    "project_license": "Apache-2.0",
+    "remote_repository_created": false,
+    "push_performed": false
+  },
+  "project_name": "MGGM XML Validator für Delphi",
+  "repository_name": "mggm-xml-validator"
+}

@@ -1,0 +1,19 @@
+MGGM XML Validator für Delphi
+Copyright 2026 MGGM Software GmbH
+
+Der von MGGM erstellte Delphi-Code steht unter der Apache License, Version 2.0.
+
+Das Repository mggm-xml-validator ist ein unabhängiges Projekt der MGGM
+Software GmbH und kein offizielles KoSIT-Projekt.
+
+Dieses Projekt basiert auf dem KoSIT XML Validator der
+Koordinierungsstelle für IT-Standards (KoSIT):
+https://github.com/itplr-kosit/validator
+
+Die Delphi-Implementierung und die native Engine-Anbindung sind Anpassungen
+gegenüber dem ursprünglichen Java-Validator. Die eingebetteten fünf
+Framework-Ressourcen sind unverändert übernommen.
+
+Für übernommene Ressourcen, SaxonC und zusätzliche Validierungsregeln gelten
+die jeweiligen ursprünglichen Lizenzbedingungen und Urheberrechtshinweise.
+Siehe THIRD_PARTY.md und ThirdParty/.

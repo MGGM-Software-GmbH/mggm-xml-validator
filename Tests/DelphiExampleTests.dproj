@@ -1,0 +1,21 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{C2763B5B-8EC5-4E4A-993D-E186C41D336D}</ProjectGuid>
+    <MainSource>DelphiExampleTests.dpr</MainSource>
+    <ProjectName>DelphiExampleTests</ProjectName>
+    <ProjectVersion>19.0</ProjectVersion>
+    <FrameworkType>None</FrameworkType>
+    <AppType>Console</AppType>
+    <Base>true</Base>
+    <Config Condition="'$(Config)'==''">Release</Config>
+    <Platform Condition="'$(Platform)'==''">Win64</Platform>
+    <TargetedPlatforms>2</TargetedPlatforms>
+    <DCC_Namespace>System;Xml;Winapi;$(DCC_Namespace)</DCC_Namespace>
+    <DCC_UnitSearchPath>..\Source</DCC_UnitSearchPath>
+    <DCC_ExeOutput>build</DCC_ExeOutput>
+    <DCC_DcuOutput>build\obj\DelphiExampleTests</DCC_DcuOutput>
+    <DCC_DebugInformation>0</DCC_DebugInformation>
+  </PropertyGroup>
+  <ItemGroup><DelphiCompile Include="$(MainSource)"><MainSource>MainSource</MainSource></DelphiCompile></ItemGroup>
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" />
+</Project>
