@@ -19,7 +19,7 @@ Die Regeln werden bei der [lokalen Paketierung](#bauen-und-lokal-paketieren) unt
 ## Voraussetzungen
 
 - Windows x64 mit registriertem MSXML 6.
-- Für die geprüften Builds: Delphi 11 Alexandria, Ziel Win64.
+- Geprüft mit Delphi 11 Alexandria und Delphi 13 Florence, jeweils für Win64.
 - Unveränderte `saxonc-core-he.dll` aus SaxonC-HE 12.10.1 für Windows x86_64 sowie deren benötigte Visual-C++-Laufzeit.
 - Passende lokale Szenariokonfigurationen und Prüfregeln für das gewünschte Rechnungsformat.
 
@@ -49,7 +49,7 @@ build/
   Notices/...
 ~~~
 
-Compilerzwischenprodukte liegen unter `build/obj/<Projektname>`; sie gehören nicht zum Laufzeitpaket. Es werden keine Unterordner mit Compilerversionen für EXE und DLL verwendet.
+Compilerzwischenprodukte liegen getrennt nach Compilerversion, Plattform, Konfiguration und Projekt unter `build/obj`; sie gehören nicht zum Laufzeitpaket. Delphi-13-Ausgaben liegen unter `build/Delphi13` und verwenden dort dieselbe Paketstruktur mit EXE, DLL und `Validation`.
 
 Ohne expliziten DLL-Pfad sucht `TMGKositValidator.Create` ausschließlich neben der aktiven Anwendung. Das aktuelle Arbeitsverzeichnis spielt dabei keine Rolle. Ein ausdrücklich übergebener DLL-Pfad muss absolut sein. Die Beispielanwendung verwendet standardmäßig `Validation` neben ihrer EXE.
 
@@ -133,7 +133,7 @@ Eine ausführbare Fassung des Streambeispiels steht unter [Examples/ValidateXmlE
 
 ## Bauen und lokal paketieren
 
-Die Projekte sind auf Delphi 11 und Win64 ausgelegt. In einer Delphi-11-Eingabeaufforderung:
+Die Projekte werden für Win64 gebaut. In der zur gewählten Compiler-Version gehörenden Delphi-Eingabeaufforderung:
 
 ~~~bat
 msbuild MGGMXmlValidator.dproj /t:Build /p:Config=Release /p:Platform=Win64
@@ -141,12 +141,22 @@ msbuild MGGMXmlValidatorBatch.dproj /t:Build /p:Config=Release /p:Platform=Win64
 msbuild Examples\ValidateXmlExample.dproj /t:Build /p:Config=Release /p:Platform=Win64
 ~~~
 
-Die EXEs entstehen direkt unter `build`. Ein Wechsel von Compiler oder Konfiguration erfordert einen erneuten Build der betroffenen Projekte; der flache Ausgabeordner enthält jeweils einen Buildstand.
+Die EXEs entstehen unter `build`, mit Delphi 13 unter `build/Delphi13`. Ein Wechsel der Konfiguration erfordert einen erneuten Build der betroffenen Projekte. Die Compilerzwischenprodukte werden nach Version, Plattform, Konfiguration und Projekt getrennt, damit verschiedene Compiler ihre DCUs nicht gemeinsam verwenden.
 
 Das [offizielle SaxonC-HE-12.10.1-Paket](https://downloads.saxonica.com/SaxonC/HE/12/SaxonCHE-windows-x86_64-12-10-1.zip) beispielsweise nach `Vendor\SaxonC` entpacken. Dort müssen `SaxonCCoreHE\bin\saxonc-core-he.dll` und `notices` vorhanden sein. Die gewünschten Regelverzeichnisse unter `Validation` bereitstellen. Herkunft: [von MGGM mitentwickelte ZUGFeRD-/Factur-X-Konfiguration bei Landrix Software](https://github.com/LandrixSoftware/validator-configuration-zugferd), [XRechnung-Konfiguration 3.0.2](https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/tag/release-2024-06-20).
 
 ~~~bat
 python package_runtime.py --sdk "Vendor\SaxonC" --validation-root "Validation"
+~~~
+
+Für das getrennte Delphi-13-Laufzeitpaket werden alle drei EXE-Pfade und das Ziel ausdrücklich angegeben:
+
+~~~bat
+python package_runtime.py --sdk "Vendor\SaxonC" --validation-root "Validation" ^
+  --executable "build\Delphi13\MGGMXmlValidator.exe" ^
+  --batch-executable "build\Delphi13\MGGMXmlValidatorBatch.exe" ^
+  --example-executable "build\Delphi13\ValidateXmlExample.exe" ^
+  --target "build\Delphi13"
 ~~~
 
 Der Paketierer prüft DLL-Hash, das Vorhandensein der drei Szenariodateien, Lizenzdateien und Zielkonflikte vor dem Kopieren. Er übernimmt die technischen Regeln unter `build\Validation`, ergänzt DLL, Beispiel-CMD und Hinweise und schreibt ein Hashmanifest. Vorhandene fremde oder veränderte Zieldateien werden nicht still überschrieben. `--target` erlaubt einen anderen Paketordner; die drei EXE-Pfade können ebenfalls ausdrücklich angegeben werden. Ob die Regeln einschließlich ihrer Importe verwendbar sind, prüft anschließend ein tatsächlicher Validierungslauf; die Paketierung ersetzt diese Prüfung nicht.

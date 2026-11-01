@@ -27,17 +27,21 @@ type
     procedure CheckSchemaRedefinition;
     procedure ExecuteCases;
   public
-    constructor Create(const EvidenceFile: string);
+    constructor Create(const EvidenceFile, FixtureRoot: string);
     destructor Destroy; override;
     function Execute(const LibraryFile, ValidationRoot, InvoiceFile: string): Integer;
   end;
 
-// Die Fixture-Struktur liegt neben dem Projekt und eine Ebene über dem Testausgabeverzeichnis.
-constructor TEngineTestSuite.Create(const EvidenceFile: string);
+// Die Fixture-Struktur liegt neben dem Projekt und eine Ebene über dem normalen Testausgabeverzeichnis.
+// Ein ausdrücklicher Pfad hält compilerabhängige Ausgabeordner von der Testdatenablage unabhängig.
+constructor TEngineTestSuite.Create(const EvidenceFile, FixtureRoot: string);
 begin
   inherited Create;
   FEvidenceFile := ExpandFileName(EvidenceFile);
-  FFixtures := ExpandFileName(TPath.Combine(ExtractFilePath(ParamStr(0)), '..\Fixtures'));
+  if FixtureRoot <> '' then
+    FFixtures := ExpandFileName(FixtureRoot)
+  else
+    FFixtures := ExpandFileName(TPath.Combine(ExtractFilePath(ParamStr(0)), '..\Fixtures'));
   FOutputFile := TPath.Combine(ExtractFileDir(FEvidenceFile), 'EngineTests-transform.xml');
   FEvidence := TJSONObject.Create;
   FCases := TJSONArray.Create;
@@ -632,18 +636,21 @@ begin
     Result := 0;
 end;
 
-// Aufruf: EngineTests LibraryFile ValidationRoot EvidenceJson [OriginalUblInvoice].
+// Aufruf: EngineTests LibraryFile ValidationRoot EvidenceJson [OriginalUblInvoice [FixtureRoot]].
 procedure Run;
 var
   Suite: TEngineTestSuite;
-  InvoiceFile: string;
+  InvoiceFile, FixtureRoot: string;
 begin
-  if (ParamCount < 3) or (ParamCount > 4) then
-    raise Exception.Create('Aufruf: EngineTests LibraryFile ValidationRoot EvidenceJson [OriginalUblInvoice]');
+  if (ParamCount < 3) or (ParamCount > 5) then
+    raise Exception.Create('Aufruf: EngineTests LibraryFile ValidationRoot EvidenceJson [OriginalUblInvoice [FixtureRoot]]');
   InvoiceFile := '';
-  if ParamCount = 4 then
+  FixtureRoot := '';
+  if ParamCount >= 4 then
     InvoiceFile := ParamStr(4);
-  Suite := TEngineTestSuite.Create(ParamStr(3));
+  if ParamCount = 5 then
+    FixtureRoot := ParamStr(5);
+  Suite := TEngineTestSuite.Create(ParamStr(3), FixtureRoot);
   try
     ExitCode := Suite.Execute(ParamStr(1), ParamStr(2), InvoiceFile);
   finally

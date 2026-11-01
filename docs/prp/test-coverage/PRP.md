@@ -18,7 +18,8 @@ Es wird kein neues Testframework und keine Nachbildung interner Java-Klassen mit
 
 Maßgebliche Projektquellen sind [TESTING.md](../../TESTING.md), die Programme unter
 `Tests`, `compare_reports.py` und [publication-verification.json](../../../Tests/publication-verification.json).
-Der Prüfnachweis dokumentiert folgende vorhandene Läufe, keine durch dieses PRP ausgeführten Tests:
+Der Prüfnachweis dokumentiert die folgenden vorhandenen Suite-Ergebnisse für Delphi 11 und 13,
+jeweils für Win64. Das PRP selbst führt diese Tests nicht aus:
 
 | Suite | Dokumentiertes Ergebnis | Bestehender Schwerpunkt |
 |---|---|---|
@@ -192,7 +193,8 @@ einen sichtbaren Fehler, keinen erfolgreichen übersprungenen Vergleich.
 `docs/TESTING.md` wird um genaue Befehle, Arbeitsverzeichnisse und Ergebnisdateien ergänzt.
 Zu protokollieren sind Delphi-Version, Win64-Konfiguration, DLL-Version und -Hash,
 Python-Version, Java-/Maven-Version im Referenzlauf, Regel- und Fixture-Hashes sowie Lauf-IDs.
-Ausgangspunkt ist Delphi 11 Alexandria/Win64; andere Plattformen gelten erst nach eigenen Läufen als geprüft.
+Die geprüften Compiler sind Delphi 11 Alexandria und Delphi 13 Florence, jeweils für Win64.
+Weitere Compiler-Versionen und Plattformen gelten erst nach eigenen Läufen als geprüft.
 Delphi-Builds und Teststarts verwenden den verfügbaren dokumentierten Buildzugang.
 Java-Abhängigkeiten werden vor einem anschließenden Offline-Referenzlauf bereitgestellt.
 Dieser Referenzlauf prüft die ausgewählten lokalen Eingaben mit beiden Validatoren. Er ist

@@ -11,8 +11,13 @@
     <Platform Condition="'$(Platform)'==''">Win64</Platform>
     <TargetedPlatforms>2</TargetedPlatforms>
     <DCC_Namespace>System;Winapi;$(DCC_Namespace)</DCC_Namespace>
-    <DCC_ExeOutput>build</DCC_ExeOutput>
-    <DCC_DcuOutput>build\obj\$(ProjectName)</DCC_DcuOutput>
+    <PRODUCTVERSION Condition="'$(PRODUCTVERSION)'==''">$([System.IO.Path]::GetFileName($([System.String]::Copy('$(BDS)').TrimEnd('\'))))</PRODUCTVERSION>
+    <CompilerOutputSuffix>\BDS$(PRODUCTVERSION)</CompilerOutputSuffix>
+    <CompilerOutputSuffix Condition="'$(PRODUCTVERSION)'=='22.0'"></CompilerOutputSuffix>
+    <CompilerOutputSuffix Condition="'$(PRODUCTVERSION)'=='23.0'">\Delphi12</CompilerOutputSuffix>
+    <CompilerOutputSuffix Condition="'$(PRODUCTVERSION)'=='37.0'">\Delphi13</CompilerOutputSuffix>
+    <DCC_ExeOutput>build$(CompilerOutputSuffix)</DCC_ExeOutput>
+    <DCC_DcuOutput>build\obj\$(PRODUCTVERSION)\$(Platform)\$(Config)\$(ProjectName)</DCC_DcuOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Config)'=='Debug'">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
