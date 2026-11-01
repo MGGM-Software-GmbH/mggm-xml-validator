@@ -6,6 +6,16 @@ Das Repository `mggm-xml-validator` ist ein unabhängiges Projekt der MGGM Softw
 
 Die XML-Verarbeitung erfolgt im eigenen Windows-Prozess mit MSXML 6 und [The Saxon XSLT and XQuery Processor from Saxonica Limited](https://www.saxonica.com/), hier als native SaxonC-HE-DLL. Eine Java-Laufzeit wird für die Validierung nicht benötigt. Szenariokonfigurationen und Regelpakete werden unverändert vom Dateisystem geladen; XML und Ergebnisse können über Streams im Speicher verarbeitet werden.
 
+## ZUGFeRD/Factur-X zusätzlich zu XRechnung
+
+**Die im lokalen Laufzeitpaket gebündelte ZUGFeRD-/Factur-X-Prüfkonfiguration wurde von MGGM mitentwickelt.** Die Zusammenstellung [validator-configuration-zugferd](https://github.com/LandrixSoftware/validator-configuration-zugferd) wird im Repository von Landrix Software gepflegt. Die [Autorenangabe der Szenariokonfiguration](https://github.com/LandrixSoftware/validator-configuration-zugferd/blob/8399f5459df34b2af9cae0d613870649b3f17a58/scenarios.xml#L5-L7) nennt MGGM Software GmbH und Landrix Software.
+
+Damit verbindet das Laufzeitpaket die Prüfung von XRechnung mit der Prüfung der XML-Daten von ZUGFeRD-/Factur-X-E-Rechnungen. Die zusätzliche Konfiguration liefert dafür die Szenarien und zugehörigen Schema-/Schematron-Prüfregeln. Unterstützte Versionen und Profile ergeben sich aus der jeweils eingesetzten Konfiguration.
+
+KoSIT trennt Prüfengine und Prüfregeln: Mit der XRechnung-Konfiguration wird XRechnung geprüft; für ZUGFeRD/Factur-X werden die zusätzlichen Regeln benötigt. **Dieselbe ZUGFeRD-/Factur-X-Konfiguration kann auch mit dem Original-KoSIT-Validator unter Java verwendet werden.** Der zusätzliche Formatumfang entsteht durch die Zusammenstellung der Regeln und ist keine Einschränkung der KoSIT-Engine.
+
+Die Regeln werden bei der [lokalen Paketierung](#bauen-und-lokal-paketieren) unter `build/Validation` übernommen. Im Git-Quellstand werden sie über ihre Herkunft referenziert. Die XML-Prüfung umfasst keine Prüfung des PDF-Containers oder der PDF/A-Konformität.
+
 ## Voraussetzungen
 
 - Windows x64 mit registriertem MSXML 6.
@@ -133,7 +143,7 @@ msbuild Examples\ValidateXmlExample.dproj /t:Build /p:Config=Release /p:Platform
 
 Die EXEs entstehen direkt unter `build`. Ein Wechsel von Compiler oder Konfiguration erfordert einen erneuten Build der betroffenen Projekte; der flache Ausgabeordner enthält jeweils einen Buildstand.
 
-Das [offizielle SaxonC-HE-12.10.1-Paket](https://downloads.saxonica.com/SaxonC/HE/12/SaxonCHE-windows-x86_64-12-10-1.zip) beispielsweise nach `Vendor\SaxonC` entpacken. Dort müssen `SaxonCCoreHE\bin\saxonc-core-he.dll` und `notices` vorhanden sein. Die gewünschten Regelverzeichnisse unter `Validation` bereitstellen. Herkunft: [ZUGFeRD-Konfiguration](https://github.com/itplr-kosit/validator-configuration-zugferd), [XRechnung-Konfiguration 3.0.2](https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/tag/release-2024-06-20).
+Das [offizielle SaxonC-HE-12.10.1-Paket](https://downloads.saxonica.com/SaxonC/HE/12/SaxonCHE-windows-x86_64-12-10-1.zip) beispielsweise nach `Vendor\SaxonC` entpacken. Dort müssen `SaxonCCoreHE\bin\saxonc-core-he.dll` und `notices` vorhanden sein. Die gewünschten Regelverzeichnisse unter `Validation` bereitstellen. Herkunft: [von MGGM mitentwickelte ZUGFeRD-/Factur-X-Konfiguration bei Landrix Software](https://github.com/LandrixSoftware/validator-configuration-zugferd), [XRechnung-Konfiguration 3.0.2](https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/tag/release-2024-06-20).
 
 ~~~bat
 python package_runtime.py --sdk "Vendor\SaxonC" --validation-root "Validation"
