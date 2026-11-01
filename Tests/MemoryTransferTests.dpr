@@ -400,7 +400,11 @@ begin
     if ExpectedStatus = 'V' then
       Require((Actual.Acceptance = kaAccept) and Actual.SchemaValid and (Actual.Errors = 0), 'Die gültige Rechnung enthält einen Ablehnungs- oder Fehlerzustand.')
     else
-      Require((Actual.Acceptance = kaReject) or (Actual.Errors > 0), 'Die fachliche Ablehnung ist im Ergebnis nicht erkennbar.');
+    begin
+      Require(Actual.Acceptance = kaReject, 'Die fachlich ungültige Rechnung wurde angenommen.');
+      Require(Actual.SchemaValid, 'Der Geschäftsregelverstoß wurde als Schemafehler eingeordnet.');
+      Require(Actual.Errors > 0, 'Der Geschäftsregelverstoß enthält keinen Fehlerbefund.');
+    end;
   end;
   if CheckEncodingText then
     Require(Pos(FNonAsciiText, string(Html.documentElement.text)) > 0, 'Der vorhandene nicht-ASCII-Rechnungstext ging beim Encoding-/HTML-Transfer verloren.');

@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-01T19:00:59.645682+00:00",
+  "checked_at": "2026-11-01T19:36:06.832988+00:00",
   "toolchains": [
     {
       "compiler": "Delphi 11 Alexandria",
@@ -18,10 +18,11 @@
       "compiler": "delphi-11",
       "configuration": "Release",
       "platform": "Win64",
-      "build_id": "{16C3F9EE-0531-4200-AEC3-290AB4594A37}",
+      "build_id": "{79F0FA52-712E-4807-AF34-3C6F57EA2879}",
       "output": "build/MGGMXmlValidator.exe",
       "dcu_directory": "build/obj/22.0/Win64/Release/MGGMXmlValidator",
-      "sha256": "9182deea2c70617c876839e2a047187146beb4826a668a66d8efde274c5c8509",
+      "sha256": "9c362e67b38fd448f5f0b2dcf84169935343bf199ca604065d2acdb735fc2db7",
+      "finished_at": "2026-11-01T19:32:41.298Z",
       "warnings": [
         "W1002"
       ]
@@ -31,10 +32,11 @@
       "compiler": "delphi-11",
       "configuration": "Release",
       "platform": "Win64",
-      "build_id": "{B53992E0-4345-4DC3-A55C-E68C94ECE7AA}",
+      "build_id": "{18479F37-4D68-4852-B2F8-024C7A72365F}",
       "output": "build/MGGMXmlValidatorBatch.exe",
       "dcu_directory": "build/obj/22.0/Win64/Release/MGGMXmlValidatorBatch",
-      "sha256": "46fa2d4de6465c55397936fbb4d50995ad3a90178b5c8797e36490181d9aef69",
+      "sha256": "3aee6d1b94dea9aee6b3d038e7757277d9b3259343bb84e56a171a002cf8a069",
+      "finished_at": "2026-11-01T19:32:42.203Z",
       "warnings": [
         "W1002"
       ]
@@ -44,36 +46,11 @@
       "compiler": "delphi-11",
       "configuration": "Release",
       "platform": "Win64",
-      "build_id": "{20982074-C311-4CEE-B355-4A31517F253F}",
+      "build_id": "{626C83FC-8A05-40AD-B725-93579BD565A8}",
       "output": "build/ValidateXmlExample.exe",
       "dcu_directory": "build/obj/22.0/Win64/Release/ValidateXmlExample",
-      "sha256": "6b5b7a395e5f3bb87e3f448f1cb84a66cf67e6af79915805bd028f3193ac4225",
-      "warnings": [
-        "W1002"
-      ]
-    },
-    {
-      "project": "EngineTests",
-      "compiler": "delphi-11",
-      "configuration": "Debug",
-      "platform": "Win64",
-      "build_id": "{F7B9C34D-9E84-4D0A-B016-E2A76853B9A7}",
-      "output": "Tests/build/EngineTests.exe",
-      "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/EngineTests",
-      "sha256": "5e60d13967f4f4ce3a69b03bda51cb0ce025ea241c973ce5bd929e9aa23cd852",
-      "warnings": [
-        "W1002"
-      ]
-    },
-    {
-      "project": "PipelineTests",
-      "compiler": "delphi-11",
-      "configuration": "Debug",
-      "platform": "Win64",
-      "build_id": "{71C4F4BE-A91E-4B4C-9764-04AD26C217AC}",
-      "output": "Tests/build/PipelineTests.exe",
-      "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/PipelineTests",
-      "sha256": "5957a54ab9d06801e9441e17dd73ea486a7d029e3c9da7c9d718d5d09792bebf",
+      "sha256": "a491614be28c5b79fb092dffbde27758df7502b43b295e9e68db8ef1f9765422",
+      "finished_at": "2026-11-01T19:32:43.110Z",
       "warnings": [
         "W1002"
       ]
@@ -83,10 +60,11 @@
       "compiler": "delphi-11",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{5AC8DBB4-8DA2-461E-AC7C-36FC9827B362}",
+      "build_id": "{A0E426F9-FA92-4109-9529-9DA68861F3BE}",
       "output": "Tests/build/CliTests.exe",
       "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/CliTests",
-      "sha256": "55d436b990fda4bc4478412ed0798d67efa7d29563bfce1e154a8df65c8bdf1e",
+      "sha256": "bf819749087b32458b337722e3768024a687ede66148447574d138c29d63c738",
+      "finished_at": "2026-11-01T19:32:43.924Z",
       "warnings": []
     },
     {
@@ -94,34 +72,25 @@
       "compiler": "delphi-11",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{4B0AC3BE-EFC0-43AF-A824-400A6D2113D2}",
+      "build_id": "{1E26D962-1822-4144-8BAC-A26267968DC5}",
       "output": "Tests/build/StreamAdapterTests.exe",
       "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/StreamAdapterTests",
-      "sha256": "2ebfe9028698bc26ae4beacce9fd1c0b461635dcbafbf302ad9fc7e40ad4bb55",
+      "sha256": "423c7fee8235a6fe538cb9c424ccca81a5b7b3f76101211619d76c7c25a0331a",
+      "finished_at": "2026-11-01T19:32:44.831Z",
       "warnings": [
         "W1002"
       ]
-    },
-    {
-      "project": "NativeReuseTests",
-      "compiler": "delphi-11",
-      "configuration": "Debug",
-      "platform": "Win64",
-      "build_id": "{CD839400-5C4E-45B0-A4DB-08CA66CAEA45}",
-      "output": "Tests/build/NativeReuseTests.exe",
-      "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/NativeReuseTests",
-      "sha256": "d0c51c3cb0703c286b6dd6244b52295bffefcf2b3ca600b2e02f4ff9fd7397d2",
-      "warnings": []
     },
     {
       "project": "MemoryTransferTests",
       "compiler": "delphi-11",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{EAE77E24-05D4-47A4-B41F-0EDC390E1302}",
+      "build_id": "{6F68D64C-5ECB-4D6E-B761-CDD064258E85}",
       "output": "Tests/build/MemoryTransferTests.exe",
       "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/MemoryTransferTests",
-      "sha256": "31ef70998ee910941c16728f5d5b64e1c809c0a58e6bbb5a30ca6a076d883b71",
+      "sha256": "0f34add7f74243c15eaa04e56d372d57d08bb4d0321275d7054fe69276f7c3d4",
+      "finished_at": "2026-11-01T19:32:45.752Z",
       "warnings": [
         "W1002"
       ]
@@ -131,10 +100,11 @@
       "compiler": "delphi-11",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{FECDFCEB-97CC-4D06-81D0-33FD85952CC7}",
+      "build_id": "{AF6E1B13-49AB-4C81-AEB6-9EDFB8A2B320}",
       "output": "Tests/build/ParallelEngineTests.exe",
       "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/ParallelEngineTests",
-      "sha256": "e3a4ef66700aa89b1d6050b814dfdc3d6121d60cd2876857e29915896c61593a",
+      "sha256": "d7e1f015055c8acefa0b5b9df4d25c3e4c61e8b44a25c11bd548fd14e715bd33",
+      "finished_at": "2026-11-01T19:32:46.658Z",
       "warnings": [
         "W1002"
       ]
@@ -144,10 +114,11 @@
       "compiler": "delphi-11",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{B4B80CC0-ECBA-4D47-AB85-4E9CBBF12AEE}",
+      "build_id": "{B2834BEB-4F03-4BF7-8AE3-EA6528D37B90}",
       "output": "Tests/build/DelphiExampleTests.exe",
       "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/DelphiExampleTests",
-      "sha256": "78a8bf82996f345947cb4a6b26b9adb55ed9c2783c07c660b5704c046cc57a85",
+      "sha256": "64c0dc8094f0a98a8d81dcfd046f63bf50d23a3184b38bd721e8c7045da4bbe4",
+      "finished_at": "2026-11-01T19:32:47.576Z",
       "warnings": [
         "W1002"
       ]
@@ -157,10 +128,11 @@
       "compiler": "delphi-11",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{96432553-B49D-46C1-9BD2-933E04F1DFF7}",
+      "build_id": "{3AE31CF4-B154-4EED-901E-C54D95BF4E3A}",
       "output": "Tests/build/BenchmarkRuns.exe",
       "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/BenchmarkRuns",
-      "sha256": "9b64be07452c8cb9b9708a6f5d202adabf0a27ab95a1c06b8152914af9dcc61e",
+      "sha256": "bb7b7a6aa940e4ed928f209062dce53252b78aefb8c7cf399782417cdd21059c",
+      "finished_at": "2026-11-01T19:32:48.359Z",
       "warnings": []
     },
     {
@@ -168,10 +140,11 @@
       "compiler": "delphi-13",
       "configuration": "Release",
       "platform": "Win64",
-      "build_id": "{FD5543B2-ED81-4A84-812E-E2CCCABBAB19}",
+      "build_id": "{A52AEBFC-E0CA-4702-BCDE-A4D31AF2F219}",
       "output": "build/Delphi13/MGGMXmlValidator.exe",
       "dcu_directory": "build/obj/37.0/Win64/Release/MGGMXmlValidator",
-      "sha256": "e317e75824137c7178fd679d6c8ae24caa4735df1165ac46f5f70c895df449b8",
+      "sha256": "12dd346f59959620241525838db2c51983d7b5e3b7e7d1663394dd6a6daf56c5",
+      "finished_at": "2026-11-01T19:32:49.245Z",
       "warnings": [
         "W1002"
       ]
@@ -181,10 +154,11 @@
       "compiler": "delphi-13",
       "configuration": "Release",
       "platform": "Win64",
-      "build_id": "{7CB280EA-FF7D-49B7-9354-1DEB8752B343}",
+      "build_id": "{B681B4AF-94CF-440F-B843-5DA303961DB5}",
       "output": "build/Delphi13/MGGMXmlValidatorBatch.exe",
       "dcu_directory": "build/obj/37.0/Win64/Release/MGGMXmlValidatorBatch",
-      "sha256": "e8e0d1fdcfc0b674b7af327e5e5055e23a69951e312b6967d03ea9ed81921bde",
+      "sha256": "474ed7734f7c4c6df3ef48079dfc14e0929dca65bdc3e86cb12d6a2564e7d6f1",
+      "finished_at": "2026-11-01T19:32:50.086Z",
       "warnings": [
         "W1002"
       ]
@@ -194,36 +168,11 @@
       "compiler": "delphi-13",
       "configuration": "Release",
       "platform": "Win64",
-      "build_id": "{4EF039E2-A5BA-43CA-A617-92D0DA817D83}",
+      "build_id": "{586F466C-D4C0-4C9D-AB80-D2C9C44BC7ED}",
       "output": "build/Delphi13/ValidateXmlExample.exe",
       "dcu_directory": "build/obj/37.0/Win64/Release/ValidateXmlExample",
-      "sha256": "a74d0248d209ad9c4eafd3e2974a02d5aa7c31b9943b9e40d37b23cb1fc3d2b2",
-      "warnings": [
-        "W1002"
-      ]
-    },
-    {
-      "project": "EngineTests",
-      "compiler": "delphi-13",
-      "configuration": "Debug",
-      "platform": "Win64",
-      "build_id": "{FF45BCFE-7D0A-4E91-85F2-64A53C0461B4}",
-      "output": "Tests/build/Delphi13/EngineTests.exe",
-      "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/EngineTests",
-      "sha256": "a84ca603de77ebf0b1ff40e25d584681f27736b789f33bcabdf48489190886b6",
-      "warnings": [
-        "W1002"
-      ]
-    },
-    {
-      "project": "PipelineTests",
-      "compiler": "delphi-13",
-      "configuration": "Debug",
-      "platform": "Win64",
-      "build_id": "{1F651857-7004-4466-A561-0962A0D86404}",
-      "output": "Tests/build/Delphi13/PipelineTests.exe",
-      "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/PipelineTests",
-      "sha256": "58eece2a331a61a3a4ef9d62cb7945476f86741322b097b5c582f23fd9055d48",
+      "sha256": "fa4db356c345bd0bdae936c98e92a246d5d2854a57b8d15857e82b1d5b4fe896",
+      "finished_at": "2026-11-01T19:32:50.906Z",
       "warnings": [
         "W1002"
       ]
@@ -233,10 +182,11 @@
       "compiler": "delphi-13",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{C64E2038-9733-429C-89E3-EDF1089D8E60}",
+      "build_id": "{3AE1DB44-3EA4-44DB-97F9-DB531D22DA58}",
       "output": "Tests/build/Delphi13/CliTests.exe",
       "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/CliTests",
-      "sha256": "e6bf56eb36746d4351261a98ae56d40e04c8267d3bf08a5b95e80fb51ac18ce8",
+      "sha256": "e4d7cc80d24bbf9a46a7f9269dc0d2e64cd1d6097ccd1632921d1db2917833d8",
+      "finished_at": "2026-11-01T19:32:51.691Z",
       "warnings": []
     },
     {
@@ -244,34 +194,25 @@
       "compiler": "delphi-13",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{92986A71-6FDF-48BB-A1E5-B4CA7FE49DEC}",
+      "build_id": "{DA6A6EB6-8C85-4A1F-92C2-800711587183}",
       "output": "Tests/build/Delphi13/StreamAdapterTests.exe",
       "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/StreamAdapterTests",
-      "sha256": "26af1b505fc750ee1baa51ff9e8976b3eecbbf5a9dc8a5dbf595e0ef104223c4",
+      "sha256": "95fb1f629c4f713f79bc0c2235320f7f69f388b97d8f1822f2a3df1a226b0fe5",
+      "finished_at": "2026-11-01T19:32:52.595Z",
       "warnings": [
         "W1002"
       ]
-    },
-    {
-      "project": "NativeReuseTests",
-      "compiler": "delphi-13",
-      "configuration": "Debug",
-      "platform": "Win64",
-      "build_id": "{DF3A6781-C286-4A15-825B-C0EA35ED3669}",
-      "output": "Tests/build/Delphi13/NativeReuseTests.exe",
-      "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/NativeReuseTests",
-      "sha256": "39b7aefa5f67e8dc6b997541198dd70c573eec9d129a5344b1abb177055593e7",
-      "warnings": []
     },
     {
       "project": "MemoryTransferTests",
       "compiler": "delphi-13",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{6D9C6EBA-5927-4313-AC38-85C5CC6ABB1B}",
+      "build_id": "{68FAC9B6-B487-4996-B2E5-10D5D2A07541}",
       "output": "Tests/build/Delphi13/MemoryTransferTests.exe",
       "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/MemoryTransferTests",
-      "sha256": "aee9268de102bdcd45caf0f7298dd0e61094fa964b5119d628daa54d77e2d8c7",
+      "sha256": "ba2dbac5f684735541c888a4957d9a7a07464054cfd75192abc41627cc0ded45",
+      "finished_at": "2026-11-01T19:32:53.465Z",
       "warnings": [
         "W1002"
       ]
@@ -281,10 +222,11 @@
       "compiler": "delphi-13",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{727470F8-48E3-49AE-B61E-6538FF1B12F1}",
+      "build_id": "{7C0542A2-040B-480D-9C6F-3F54DE885C4A}",
       "output": "Tests/build/Delphi13/ParallelEngineTests.exe",
       "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/ParallelEngineTests",
-      "sha256": "9fd383bf7ead6d12607aa141876a95d0dce695c02593a808ad26f7b4a019760d",
+      "sha256": "3b656d352ce99af3db61903297664c1f9b8f15d276f261c2bee40f5db05857d5",
+      "finished_at": "2026-11-01T19:32:54.346Z",
       "warnings": [
         "W1002"
       ]
@@ -294,10 +236,11 @@
       "compiler": "delphi-13",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{F5F519B6-40A8-4829-93B1-D1FEADB61CD9}",
+      "build_id": "{CFD8B4E5-83F5-4E3E-A861-6FBEE5FD5C7D}",
       "output": "Tests/build/Delphi13/DelphiExampleTests.exe",
       "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/DelphiExampleTests",
-      "sha256": "b87a9c182609c5094adb1c0062e6235cdeeb1c8c29fabff916f0ab7374b341da",
+      "sha256": "1fb228ceb73fa18634685713141fa9ae0f0cc83d8883b2ed7f0bfeea6c6bcb72",
+      "finished_at": "2026-11-01T19:32:55.210Z",
       "warnings": [
         "W1002"
       ]
@@ -307,10 +250,91 @@
       "compiler": "delphi-13",
       "configuration": "Debug",
       "platform": "Win64",
-      "build_id": "{0B750588-9F66-4043-9380-3E1D3C1AC1D8}",
+      "build_id": "{C4286EA2-CC17-4D69-8254-E0B838EC89A2}",
       "output": "Tests/build/Delphi13/BenchmarkRuns.exe",
       "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/BenchmarkRuns",
-      "sha256": "9b5984fa8c47c7baa372a2bf836215e86861c038157b20bd73a53bbcbf69e6c2",
+      "sha256": "88cb16e550e2d2ef4c8d24b7eaef20b9c24f83c41388b49174051c5e09a36d26",
+      "finished_at": "2026-11-01T19:32:55.960Z",
+      "warnings": []
+    },
+    {
+      "project": "EngineTests",
+      "compiler": "delphi-11",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{DD2B52C2-4566-49F9-94B6-5B171470DEE5}",
+      "output": "Tests/build/EngineTests.exe",
+      "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/EngineTests",
+      "sha256": "256aa98c192e792a202e6390eb092bb0808090b9ff1d931ddecfcf131b550543",
+      "finished_at": "2026-11-01T19:31:42.488Z",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "EngineTests",
+      "compiler": "delphi-13",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{BEE9E500-8233-401A-A842-B6E0821D6B4A}",
+      "output": "Tests/build/Delphi13/EngineTests.exe",
+      "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/EngineTests",
+      "sha256": "d7ca5e8b15feb297307786d302957f8f432c2da5dd74a9f57ccd638910adc1fe",
+      "finished_at": "2026-11-01T19:31:49.841Z",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "PipelineTests",
+      "compiler": "delphi-11",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{348DC123-C4E0-46BA-B126-D2CD0800289D}",
+      "output": "Tests/build/PipelineTests.exe",
+      "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/PipelineTests",
+      "sha256": "e36bdac02fbc65c5c838728773c0cd388b9b75e9cf014a1aab90542bacda1601",
+      "finished_at": "2026-11-01T19:31:50.789Z",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "PipelineTests",
+      "compiler": "delphi-13",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{45439FF2-7931-440C-BA48-EEC32C65F299}",
+      "output": "Tests/build/Delphi13/PipelineTests.exe",
+      "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/PipelineTests",
+      "sha256": "104c73b27fcecec318caab38be5997962fbe96474c47d4cc6bd5235195993504",
+      "finished_at": "2026-11-01T19:31:51.691Z",
+      "warnings": [
+        "W1002"
+      ]
+    },
+    {
+      "project": "NativeReuseTests",
+      "compiler": "delphi-11",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{203C8AAC-3F41-46BF-8A86-0925EED6F004}",
+      "output": "Tests/build/NativeReuseTests.exe",
+      "dcu_directory": "Tests/build/obj/22.0/Win64/Debug/NativeReuseTests",
+      "sha256": "9130e37317583223134eb8a25ac0445eb8b94bf9b9f508024a0f2fd10b36a096",
+      "finished_at": "2026-11-01T19:20:08.343Z",
+      "warnings": []
+    },
+    {
+      "project": "NativeReuseTests",
+      "compiler": "delphi-13",
+      "configuration": "Debug",
+      "platform": "Win64",
+      "build_id": "{3928B016-1F32-4545-A5D5-018D755C74A2}",
+      "output": "Tests/build/Delphi13/NativeReuseTests.exe",
+      "dcu_directory": "Tests/build/obj/37.0/Win64/Debug/NativeReuseTests",
+      "sha256": "ce5cc0cefa341d4de501af2ce4513913e843696bf829d881ac5d6ec8c32df27a",
+      "finished_at": "2026-11-01T19:20:33.367Z",
       "warnings": []
     }
   ],
@@ -318,138 +342,139 @@
     {
       "program": "EngineTests",
       "compiler": "delphi-11",
-      "run_id": "20CD8845-B08A-4734-9B1B-6FB9EB6C2E20",
+      "run_id": "02ABB026-219A-460D-BD74-B57F5CE0B85C",
       "exit_code": 0,
-      "passed": 38,
-      "total": 38
-    },
-    {
-      "program": "PipelineTests",
-      "compiler": "delphi-11",
-      "run_id": "5143C421-E59E-4602-B051-369BB15C92C8",
-      "exit_code": 0,
-      "passed": 16,
-      "total": 16
-    },
-    {
-      "program": "CliTests",
-      "compiler": "delphi-11",
-      "run_id": "446A46F1-B40B-4C1E-BBE4-E28195CE7EE4",
-      "exit_code": 0,
-      "passed": 16,
-      "total": 16
-    },
-    {
-      "program": "StreamAdapterTests",
-      "compiler": "delphi-11",
-      "run_id": "104DF4D0-C112-4A15-82EC-750176FAB117",
-      "exit_code": 0,
-      "passed": 4,
-      "total": 4
-    },
-    {
-      "program": "NativeReuseTests",
-      "compiler": "delphi-11",
-      "run_id": "4AEC81EA-A1EE-43DA-8A9E-CEF4CA275A17",
-      "exit_code": 0,
-      "passed": 20,
-      "total": 20
-    },
-    {
-      "program": "MemoryTransferTests",
-      "compiler": "delphi-11",
-      "run_id": "F9CE7B8A-5B4E-457F-9D8E-5D0E05C46E7B",
-      "exit_code": 0,
-      "passed": 14,
-      "total": 14
-    },
-    {
-      "program": "DelphiExampleTests",
-      "compiler": "delphi-11",
-      "run_id": "4F431513-73AB-4AFC-879D-7CE5B6455269",
-      "exit_code": 0,
-      "passed": 17,
-      "total": 17
-    },
-    {
-      "program": "ParallelEngineTests",
-      "compiler": "delphi-11",
-      "run_id": "87FFABB4-7140-4465-8332-15B36FE635CA",
-      "exit_code": 0,
-      "passed": true,
-      "validation_calls": 16,
-      "overlapping_rounds": 8
+      "passed": 59,
+      "total": 59
     },
     {
       "program": "EngineTests",
       "compiler": "delphi-13",
-      "run_id": "0532BD97-FF8F-412B-B20F-45CED92ED55C",
+      "run_id": "83A2FE89-45C7-458B-9F4D-B7AAF32D4B08",
       "exit_code": 0,
-      "passed": 38,
-      "total": 38
+      "passed": 59,
+      "total": 59
+    },
+    {
+      "program": "PipelineTests",
+      "compiler": "delphi-11",
+      "run_id": "51954F00-28E8-4D4C-867C-7F53AD34065C",
+      "exit_code": 0,
+      "passed": 32,
+      "total": 32
     },
     {
       "program": "PipelineTests",
       "compiler": "delphi-13",
-      "run_id": "9AC61FDC-2F10-4B4E-9760-35C34B53C830",
+      "run_id": "213B2872-0526-443B-9849-0C13CFB47B5E",
       "exit_code": 0,
-      "passed": 16,
-      "total": 16
+      "passed": 32,
+      "total": 32
+    },
+    {
+      "program": "NativeReuseTests",
+      "compiler": "delphi-11",
+      "run_id": "D69DCEC0-21AC-4F19-9DF0-6B81506D8B16",
+      "exit_code": 0,
+      "passed": 22,
+      "total": 22
+    },
+    {
+      "program": "NativeReuseTests",
+      "compiler": "delphi-13",
+      "run_id": "26A6EF2E-5A2A-459F-9B43-7CF5336DC73F",
+      "exit_code": 0,
+      "passed": 22,
+      "total": 22
     },
     {
       "program": "CliTests",
-      "compiler": "delphi-13",
-      "run_id": "41FC968A-AAB1-44C1-8C6D-2FA3F601523D",
+      "compiler": "delphi-11",
+      "run_id": "E8A00DBD-075D-421D-BEBF-EE7509673AD1",
       "exit_code": 0,
-      "passed": 16,
-      "total": 16
+      "passed": 56,
+      "total": 56
     },
     {
       "program": "StreamAdapterTests",
-      "compiler": "delphi-13",
-      "run_id": "75EF805C-A5F6-46E7-9FB4-1247616A7C70",
+      "compiler": "delphi-11",
+      "run_id": "3580DC0E-2A79-49E0-92A0-EFB40EA1A369",
       "exit_code": 0,
       "passed": 4,
       "total": 4
     },
     {
-      "program": "NativeReuseTests",
-      "compiler": "delphi-13",
-      "run_id": "7A1C34C6-EFC2-4FBD-8548-CE1F7256755D",
-      "exit_code": 0,
-      "passed": 20,
-      "total": 20
-    },
-    {
       "program": "MemoryTransferTests",
-      "compiler": "delphi-13",
-      "run_id": "FC89B394-2589-438E-94A9-FF78B00C59E3",
+      "compiler": "delphi-11",
+      "run_id": "077A58B9-A6A9-4C65-A7FC-F910A1FB3501",
       "exit_code": 0,
       "passed": 14,
       "total": 14
     },
     {
+      "program": "ParallelEngineTests",
+      "compiler": "delphi-11",
+      "run_id": "E27DE5B6-3924-4941-ADC8-92C50CE43D10",
+      "exit_code": 0,
+      "passed": true,
+      "validation_calls": 16,
+      "overlapping_rounds": 8
+    },
+    {
       "program": "DelphiExampleTests",
-      "compiler": "delphi-13",
-      "run_id": "A3FD9EED-186D-4238-B38D-98F01745F8D0",
+      "compiler": "delphi-11",
+      "run_id": "1CD16A14-C559-466C-B4F2-AD24427B81F3",
       "exit_code": 0,
       "passed": 17,
       "total": 17
     },
     {
+      "program": "CliTests",
+      "compiler": "delphi-13",
+      "run_id": "6019F345-696A-44BF-8B3B-31243E3AF8C8",
+      "exit_code": 0,
+      "passed": 56,
+      "total": 56
+    },
+    {
+      "program": "StreamAdapterTests",
+      "compiler": "delphi-13",
+      "run_id": "AA213996-8E2F-4797-B999-78A9F109370C",
+      "exit_code": 0,
+      "passed": 4,
+      "total": 4
+    },
+    {
+      "program": "MemoryTransferTests",
+      "compiler": "delphi-13",
+      "run_id": "37D20017-2A2D-436A-A1AB-30886671697B",
+      "exit_code": 0,
+      "passed": 14,
+      "total": 14
+    },
+    {
       "program": "ParallelEngineTests",
       "compiler": "delphi-13",
-      "run_id": "6792D3FA-F5F4-4E43-B129-40D3991EA108",
+      "run_id": "4F6362FC-685B-4AF7-BE14-2D98B71D1781",
       "exit_code": 0,
       "passed": true,
       "validation_calls": 16,
       "overlapping_rounds": 8
+    },
+    {
+      "program": "DelphiExampleTests",
+      "compiler": "delphi-13",
+      "run_id": "B473DD7F-193B-4775-BE3E-9A10CCE0DECA",
+      "exit_code": 0,
+      "passed": 17,
+      "total": 17
     }
   ],
   "python_tests": {
-    "passed": 81,
-    "total": 81,
-    "exit_code": 0
+    "passed": 130,
+    "total": 130,
+    "exit_code": 0,
+    "python_version": "3.12.3"
   },
   "packages": [
     {
@@ -459,7 +484,8 @@
       "rule_files": 219,
       "manifest_hash_mismatches": 0,
       "original_rule_byte_mismatches": 0,
-      "longest_tested_rule_path_characters": 280
+      "sdk": "SaxonC-HE 12.10.1 Windows x86_64",
+      "dll_sha256": "2a15c4631efa5b45a86b63b0618da32acf5552abf653c36b54f1b2932df94a6c"
     },
     {
       "compiler": "delphi-13",
@@ -468,49 +494,44 @@
       "rule_files": 219,
       "manifest_hash_mismatches": 0,
       "original_rule_byte_mismatches": 0,
-      "longest_tested_rule_path_characters": 289
+      "sdk": "SaxonC-HE 12.10.1 Windows x86_64",
+      "dll_sha256": "2a15c4631efa5b45a86b63b0618da32acf5552abf653c36b54f1b2932df94a6c"
     }
   ],
-  "corpus_regression": [
-    {
-      "compiler": "delphi-11",
-      "passed": 23,
-      "total": 23,
-      "comparison": "Aktuelle Berichtsignaturen gegenüber dem gesicherten Vergleichsbestand sowie zwischen Delphi 11 und 13; kein erneuter Java-Lauf.",
-      "batch_run_id": "21DFE62C-99B6-45B6-A896-FC2FB368323F",
-      "batch_exit_code": 9,
-      "expected_rejections_or_errors": 9
+  "corpus_regression": {
+    "checked_at": "2026-11-01T19:34:46.144956+00:00",
+    "cases": 23,
+    "input_sha256_verified": 23,
+    "compiler_signature_equal": 23,
+    "compiler_public_equal": 23,
+    "decisions_equal": 23,
+    "schematron_equal": 23,
+    "normalized_signature_equal": 21,
+    "normalized_findings_equal": 22,
+    "full_artifacts_equal": 22,
+    "native_full_input_hash_verified": {
+      "native11": 23,
+      "native13": 23
     },
-    {
-      "compiler": "delphi-13",
-      "passed": 23,
-      "total": 23,
-      "comparison": "Aktuelle Berichtsignaturen gegenüber dem gesicherten Vergleichsbestand sowie zwischen Delphi 11 und 13; kein erneuter Java-Lauf.",
-      "batch_run_id": "F9F765F8-668C-46DD-906F-07BE02FF2EF8",
-      "batch_exit_code": 9,
-      "expected_rejections_or_errors": 9
-    }
-  ],
-  "counterprobes": {
-    "missing_explicit_fixture_root": {
-      "compiler": "delphi-13",
-      "exit_code": 1,
-      "run_id": "35572C9F-525A-47D6-992F-CB1D23E9E7E9",
-      "detected": true
+    "java_input_hash_verified": 23,
+    "current_status_counts": {
+      "V": 12,
+      "W": 2,
+      "E": 7,
+      "F": 2
     },
-    "bds_version_derivation": {
-      "compiler": "delphi-13",
-      "inherited_product_version_cleared": true,
-      "success": true,
-      "build_id": "{E228B8A8-6F74-45A2-94EE-0E1F6BCC4201}",
-      "actual_output": "build/Delphi13/MGGMXmlValidator.exe",
-      "actual_dcu_directory": "build/obj/37.0/Win64/Release/MGGMXmlValidator"
-    },
-    "output_isolation": {
-      "baseline_files_checked": 23,
-      "changed_delphi11_files": [],
-      "original_ubl_exists": true
-    }
+    "artifact_errors": {},
+    "scope": "Separater Legacy-23-Lauf; keine Erweiterung oder Ersetzung der neuen strengen Referenzsuite",
+    "legacy_public_status_reference": "Nicht vorhanden; öffentliche Statuswerte sind nur zwischen aktuellen Compilern verglichen",
+    "process_run_ids": [
+      "A279721A-3739-4C51-8C0B-50050F0C7ED6",
+      "43903A16-9E44-4EF4-9892-D79174FA0E6E",
+      "F3279C5A-E942-47AD-AD3D-EEC36F1C400B",
+      "472CDBA6-C5F0-45B0-AD81-7BB4A2C72C33",
+      "D56F462A-1197-4EF8-9086-9F6CFD4E1FF4",
+      "702787C8-BA61-45C4-A8BE-75352A5929EF"
+    ],
+    "difference": "zf-minimum: zwei Java-Schemafehler, sieben MSXML-Schemafehler; fünf zusätzliche Folgeelementdiagnosen bleiben sichtbar."
   },
   "framework_resources": {
     "scenarios.xsd": "3990b4386b8939cb3bba92b96047238c9465402eaed10f2735fb7d9275525321",
@@ -520,11 +541,11 @@
     "identity.xsl": "cacbff8cd3ad97c3164d919cfdee3664042610d7ad61f9ecebc4858a369002cc"
   },
   "source_export": {
-    "source_files_including_this_proof": 81,
+    "source_files_including_this_proof": 103,
     "source_byte_mismatches": 0,
     "git_metadata": false,
     "binary_artifacts": 0,
-    "python_tests_passed": 81
+    "python_tests_passed": 130
   },
   "limits": [
     "Win32, andere Compiler-Versionen als Delphi 11 und 13 sowie ein Rechner ohne Entwicklungswerkzeuge wurden nicht geprüft.",
@@ -533,11 +554,126 @@
   ],
   "publication": {
     "project_license": "Apache-2.0",
-    "remote_repository_created": true,
-    "push_performed": true,
-    "visibility": "private",
-    "url": "https://github.com/MGGM-Software-GmbH/mggm-xml-validator"
+    "push_performed_for_this_change": false,
+    "repository_url": "https://github.com/MGGM-Software-GmbH/mggm-xml-validator",
+    "existing_repository_visibility": "private",
+    "visibility_verification": "Separater Veröffentlichungsauftrag; in diesem Prüfauftrag nicht erneut abgefragt."
   },
   "project_name": "MGGM XML Validator für Delphi",
-  "repository_name": "mggm-xml-validator"
+  "repository_name": "mggm-xml-validator",
+  "reference_corpus": {
+    "run_id": "reference-verified-bb5413987e9748459bdacba2ae36690a",
+    "fixture_manifest_sha256": "ffb32c88174f760139bb84b0deb88a06b6505148fc427e76ec7a0bea7a48cb8b",
+    "java": {
+      "execution_id": "c61c16edae3a48698600d265fb7dc352",
+      "started_at": "2026-11-01T19:20:52.657402+00:00",
+      "returncode": 7,
+      "java_version": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1-1-24.04.4-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-24.04.4-Ubuntu, mixed mode, sharing)",
+      "maven_used": false,
+      "jar_sha256": "799e64befca97d4080e03608c80b85dd5a5ecc5f4ae4f35d1116ec2855b9a7c9"
+    },
+    "native": [
+      {
+        "compiler": "delphi-11",
+        "run_id": "7737C157-D35E-45C3-B60C-BA4E43698DAA",
+        "validator_exit_code": 7,
+        "expected_rejections": 7,
+        "passed": 10,
+        "total": 10,
+        "counterchecks": {
+          "acceptance": true,
+          "status": true,
+          "validity": true,
+          "finding_removed": true,
+          "finding_added": true,
+          "finding_duplicated": true,
+          "finding_code": true,
+          "finding_level": true,
+          "finding_location": true,
+          "finding_text": true,
+          "phase": true,
+          "structure": true,
+          "hash": true,
+          "report_input_hash": true,
+          "report_input_schema": true,
+          "html": true,
+          "allowed_timestamp": true
+        }
+      },
+      {
+        "compiler": "delphi-13",
+        "run_id": "65F64BA8-D35D-42BB-A408-883B7676B532",
+        "validator_exit_code": 7,
+        "expected_rejections": 7,
+        "passed": 10,
+        "total": 10,
+        "counterchecks": {
+          "acceptance": true,
+          "status": true,
+          "validity": true,
+          "finding_removed": true,
+          "finding_added": true,
+          "finding_duplicated": true,
+          "finding_code": true,
+          "finding_level": true,
+          "finding_location": true,
+          "finding_text": true,
+          "phase": true,
+          "structure": true,
+          "hash": true,
+          "report_input_hash": true,
+          "report_input_schema": true,
+          "html": true,
+          "allowed_timestamp": true
+        }
+      }
+    ]
+  },
+  "original_method_inventory": {
+    "source_commit": "37cddce28e15ac3a0319db006ab21d3f1064ca8c",
+    "methods": 201,
+    "source_files": 99,
+    "classifications": {
+      "not_relevant": 67,
+      "covered": 134
+    },
+    "original_git_blob_hash_mismatches": 0,
+    "counterprobe_tests": 12
+  },
+  "source_hashes": {
+    "Tests/reference_corpus.py": "825d667264393c945a210619bee7f51161b4a07c269db551c9acd8fda80b3621",
+    "Tests/test_compare_reports.py": "644aa12feb202283c8057d1498a0784f5b4b75503ff8cea786f5b74b55b64425",
+    "Tests/test_original_test_inventory.py": "9d0c966a7f52b84c9a79c4bc4e7d7563b010623aa7960fc53a5fb34545940018",
+    "Tests/test_reference_corpus.py": "3748567e24ee24511204eda5dcba9632b3e7fa7ad1e01755b846e839d9fc2523",
+    "verify_original_test_inventory.py": "26644a1c6d7c3f13cc29c045a06a70752a4fbc94a5378174fc2461be25a10023",
+    "Examples/MGKositStreamAdapter.pas": "0aef84349cc9d364768ad7db7be013d815f05a9275a61896c4aec3fe95acbb47",
+    "Examples/ValidateXmlExample.dpr": "f389366557d939786e5c461baae867e67e3ee71884d3b05237b7a63ec982cdff",
+    "MGGMXmlValidator.dpr": "c3835facc3a5f5e544b22f5873a064d1891efcff06efdb6d8e07fe9e417e77d1",
+    "MGGMXmlValidatorBatch.dpr": "d28b1b0b6041acdc1bd488d3f3eac11adef89757856d3a09892bef9ea0e32800",
+    "Source/MGKosit.pas": "1af2291b906402b2aef16ba773127aacda5ea1d41702f5a70791f82b3ed144ca",
+    "Source/MGKositEngine.pas": "3df57d274f2636c6ca2871f07319d7d2ab66e5b0a3ade475deff5df049529240",
+    "Source/MGKositNative.pas": "b55349dc19ac03f2788a3d877d81e67e0e0441562f2e4eb2899dcf972f21bbec",
+    "Source/MGKositTypes.pas": "b27794c4f81d646b18efde8e80ccb18b7d3732c8e055097ecf3e6139341dd80a",
+    "Source/MGKositValidator.pas": "ffb5d573f4bfc9fc6d6579658a27131256391c285a367d52e09f272c031d202e",
+    "Tests/BenchmarkRuns.dpr": "ccf6acd6024193f5b0bafc31d5fe7f4c0eaede4213ac3ec0cd8ed336c1e47004",
+    "Tests/CliTests.dpr": "b5fac4c92130025977cf135fe1f230f061143520b3ca7c8c6b8adc13615cff81",
+    "Tests/DelphiExampleTests.dpr": "7d09668206dc9e832a243b55d5c71f193302b46112a677d6e8f70009ffcf05f4",
+    "Tests/EngineTests.dpr": "c2d61496c397b9d3b48cb664f86c519aa8aae999264a2fccef73bc6dcdf7bb6e",
+    "Tests/MemoryTransferTests.dpr": "bd217c2d0dc32667e4402d03a90d811cb0ec27fa6750b266d7d3de6a81b6628a",
+    "Tests/NativeReuseTests.dpr": "1acedaac5a879915c4461cfcf8d44e9eaa1f525d00256b4a81c34556371f6249",
+    "Tests/ParallelEngineTests.dpr": "176f338f111b991f8d38fc0babd4cc976adfd0f019669ae080776a22ced951ce",
+    "Tests/PipelineTests.dpr": "4247c162a21c4ad67338ca824c42581c921cb8440478381019618d156b5fa0d1",
+    "Tests/StreamAdapterTests.dpr": "bf6959a26c87fedeaf5cd091986136ac4a32d27735137d51989f4afd10648e0d",
+    "Tests/test_collect_benchmark.py": "bd119509bc6a1e2bd3ee11871f9fdc0b6981ba6be51735f36eed7170e4736073",
+    "Tests/test_compare_benchmark.py": "db608c539b76c7874002867e4316d7d562ace7bc502fa08e6c261fe93d80982a",
+    "Tests/test_export_source.py": "9a791dc395807676087faa2776bf21a66a31625526dd5cefa294bbe4687dd7c4",
+    "Tests/test_framework_resources.py": "61e4eebb09f06faef51aad99c9096baeb9d180c9757fb9d305a922bff5753791",
+    "Tests/test_package_runtime.py": "f094ce8d344050ecd513fc97be96acff2dcb85ac8471179fcfb29e810e0a5f2c",
+    "collect_benchmark.py": "a6eae0ef53d3d2c69bc62c2a36e3218073e4b121495ae7abea1158c3efccc4f1",
+    "compare_benchmark.py": "1e4ec1bbe9f623a57364416120d70b7fb8ccd5115ce0199d1af8ebbc80a52848",
+    "compare_reports.py": "9acaf8fe40b084e29880014a351e506fa4fc96fdc730d4d0f70a72d51db3704f",
+    "export_source.py": "42e72061b8a1f83682f36fc0d798d54bd08d17b55f701f87b55ce51902937567",
+    "package_runtime.py": "7c7dd487e79b7043c71c6a83a183d0b19e9d07e05abdcc1f14a216be9180ba6c",
+    "uKositCli.pas": "8c411303222205f566bf8f649bc79b758840eaa19dd18ddaa9a83391530d4775"
+  }
 }

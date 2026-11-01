@@ -129,6 +129,43 @@ begin
       Require(Native.EvaluateBoolean(SourceFile, 'exists(/test:root)', ['test', 'urn:first']), 'Erster Namespace überschrieben');
       Require(Native.XPathProcessorCount = 3, 'Namespace-Prozessoren nicht wiederverwendet');
     end);
+  RunCase('xpath-namespace-variants',
+    procedure
+    var
+      NamespaceFile: string;
+      NamespaceBindings: TArray<string>;
+    begin
+      NamespaceFile := TPath.Combine(Root, 'namespace-variants.xml');
+      TFile.WriteAllText(NamespaceFile, '<root><html/><html xmlns="http://www.w3.org/1999/xhtml"/></root>', TEncoding.UTF8);
+      NamespaceBindings := nil;
+      Require(Native.EvaluateBoolean(NamespaceFile, 'count(//html) = 1', NamespaceBindings), 'XPath ohne Namespacebindung liefert falschen Inhalt');
+      Require(Native.EvaluateBoolean(NamespaceFile, 'count(//html) = 1', []), 'XPath mit leerer Namespacebindung liefert falschen Inhalt');
+      Require(Native.EvaluateBoolean(NamespaceFile, 'count(//html:html) = 1', ['html', 'http://www.w3.org/1999/xhtml']), 'Der XHTML-Namespace wird nicht gebunden');
+      Require(not Native.EvaluateBoolean(NamespaceFile, 'exists(//html:html)', ['html', 'urn:wrong']), 'Unterschiedliche Namespacebindungen werden vermischt');
+      Require(Native.EvaluateBoolean(NamespaceFile, 'count(//html:html) = 1', ['html', 'http://www.w3.org/1999/xhtml']), 'Der XHTML-Namespace wurde überschrieben');
+    end);
+  RunCase('unknown-xpath-namespace',
+    procedure
+    var
+      Rejected: Boolean;
+      Diagnostic: string;
+      NamespaceBindings: TArray<string>;
+    begin
+      Rejected := False;
+      NamespaceBindings := nil;
+      try
+        Native.EvaluateBoolean(SourceFile, '//html:html', NamespaceBindings);
+      except
+        on Error: EMGKositNative do
+        begin
+          Rejected := True;
+          Diagnostic := Error.Message;
+        end;
+      end;
+      Require(Rejected and (Pos('html', Diagnostic) > 0) and (Pos('Namespace', Diagnostic) > 0), 'Unbekanntes Präfix ohne konkrete Namespacediagnose: ' + Diagnostic);
+      Require(Native.EvaluateBoolean(SourceFile, 'exists(/test:root)', ['test', 'urn:first']), 'Gültiger Namespace nach unbekanntem Präfix nicht auswertbar');
+      Evidence.AddPair('unknown_namespace_diagnostic', Diagnostic);
+    end);
   RunCase('Dokumentparameter wechseln und entfallen',
     procedure
     begin

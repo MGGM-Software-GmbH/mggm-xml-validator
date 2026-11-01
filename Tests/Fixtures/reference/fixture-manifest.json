@@ -1,0 +1,286 @@
+{
+  "format_version": 1,
+  "source_license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+  "rule_hashes": "rule-hashes.json",
+  "java_validator": {
+    "version": "1.6.3",
+    "sha256": "799e64befca97d4080e03608c80b85dd5a5ecc5f4ae4f35d1116ec2855b9a7c9",
+    "source_commit": "37cddce28e15ac3a0319db006ab21d3f1064ca8c",
+    "source": "https://github.com/itplr-kosit/validator/releases/tag/v1.6.3"
+  },
+  "cases": [
+    {
+      "name": "xr-ubl-valid",
+      "file": "xr-ubl-valid.xml",
+      "sha256": "0efafa05c74d06ff25bbc2b70bcb2e9f14b97d22a4b33c5e92838bf2cc8986cb",
+      "profile": "XRechnung 3.0 UBL",
+      "purpose": "unverändertes Original",
+      "expected": {
+        "status": "V",
+        "accepted": true,
+        "schema_valid": true,
+        "processing_error": false,
+        "report_valid": true,
+        "required_findings": []
+      },
+      "source": {
+        "repository": "https://github.com/itplr-kosit/xrechnung-testsuite",
+        "commit": "04cb0e80c14aaa4fb40c1118846570756dc534cd",
+        "original_path": "src/test/business-cases/standard/01.01a-INVOICE_ubl.xml",
+        "original_sha256": "0efafa05c74d06ff25bbc2b70bcb2e9f14b97d22a4b33c5e92838bf2cc8986cb",
+        "license": "Apache-2.0",
+        "license_file": "XRechnung-Testsuite-LICENSE",
+        "derived": false,
+        "change": "unverändertes Original",
+        "license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      }
+    },
+    {
+      "name": "xr-cii-valid",
+      "file": "xr-cii-valid.xml",
+      "sha256": "e58a673aa659973ba190c25fd583050af3239a58b3ab04b1c2b2583920d203e6",
+      "profile": "XRechnung 3.0 CII",
+      "purpose": "unverändertes Original",
+      "expected": {
+        "status": "V",
+        "accepted": true,
+        "schema_valid": true,
+        "processing_error": false,
+        "report_valid": true,
+        "required_findings": []
+      },
+      "source": {
+        "repository": "https://github.com/itplr-kosit/xrechnung-testsuite",
+        "commit": "04cb0e80c14aaa4fb40c1118846570756dc534cd",
+        "original_path": "src/test/business-cases/standard/01.01a-INVOICE_uncefact.xml",
+        "original_sha256": "e58a673aa659973ba190c25fd583050af3239a58b3ab04b1c2b2583920d203e6",
+        "license": "Apache-2.0",
+        "license_file": "XRechnung-Testsuite-LICENSE",
+        "derived": false,
+        "change": "unverändertes Original",
+        "license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      }
+    },
+    {
+      "name": "xr-ubl-schema-error",
+      "diagnostic_exception": "schema-unexpected-element",
+      "file": "xr-ubl-schema-error.xml",
+      "sha256": "c71624ba8b0f2e371b93b925e32d716cc2dc669575cf8a03e9d54719acc97455",
+      "profile": "XRechnung 3.0 UBL",
+      "purpose": "cbc:ID durch cbc:UnexpectedID ersetzt",
+      "expected": {
+        "status": "E",
+        "accepted": false,
+        "schema_valid": false,
+        "processing_error": false,
+        "report_valid": false,
+        "required_findings": []
+      },
+      "source": {
+        "repository": "https://github.com/itplr-kosit/xrechnung-testsuite",
+        "commit": "04cb0e80c14aaa4fb40c1118846570756dc534cd",
+        "original_path": "src/test/business-cases/standard/01.01a-INVOICE_ubl.xml",
+        "original_sha256": "0efafa05c74d06ff25bbc2b70bcb2e9f14b97d22a4b33c5e92838bf2cc8986cb",
+        "license": "Apache-2.0",
+        "license_file": "XRechnung-Testsuite-LICENSE",
+        "derived": true,
+        "change": "cbc:ID durch cbc:UnexpectedID ersetzt",
+        "license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      }
+    },
+    {
+      "name": "xr-ubl-business-error",
+      "file": "xr-ubl-business-error.xml",
+      "sha256": "5ff5fdd02edb76a096916c78fd8764f17bc25c4f9bcd47f07714dc4480a57efd",
+      "profile": "XRechnung 3.0 UBL",
+      "purpose": "InvoiceTypeCode 380 durch 999 ersetzt",
+      "expected": {
+        "status": "E",
+        "accepted": false,
+        "schema_valid": true,
+        "processing_error": false,
+        "report_valid": false,
+        "required_findings": [
+          {
+            "code": "BR-CL-01",
+            "level": "error"
+          },
+          {
+            "code": "BR-DE-17",
+            "level": "warning"
+          }
+        ]
+      },
+      "source": {
+        "repository": "https://github.com/itplr-kosit/xrechnung-testsuite",
+        "commit": "04cb0e80c14aaa4fb40c1118846570756dc534cd",
+        "original_path": "src/test/business-cases/standard/01.01a-INVOICE_ubl.xml",
+        "original_sha256": "0efafa05c74d06ff25bbc2b70bcb2e9f14b97d22a4b33c5e92838bf2cc8986cb",
+        "license": "Apache-2.0",
+        "license_file": "XRechnung-Testsuite-LICENSE",
+        "derived": true,
+        "change": "InvoiceTypeCode 380 durch 999 ersetzt",
+        "license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      }
+    },
+    {
+      "name": "zf-en16931-valid",
+      "file": "zf-en16931-valid.xml",
+      "sha256": "dab5266827327516722a99d1806a63ee0729701c8c4340cc11f63f82d8e557e2",
+      "profile": "ZUGFeRD 2.5.2 / Factur-X 1.09.2, EN16931/Comfort",
+      "purpose": "Guideline-ID auf urn:cen.eu:en16931:2017 gesetzt",
+      "expected": {
+        "status": "W",
+        "accepted": true,
+        "schema_valid": true,
+        "processing_error": false,
+        "report_valid": false,
+        "required_findings": [
+          {
+            "code": "PEPPOL-EN16931-R008",
+            "level": "warning"
+          }
+        ]
+      },
+      "source": {
+        "repository": "https://github.com/itplr-kosit/xrechnung-testsuite",
+        "commit": "04cb0e80c14aaa4fb40c1118846570756dc534cd",
+        "original_path": "src/test/business-cases/standard/01.01a-INVOICE_uncefact.xml",
+        "original_sha256": "e58a673aa659973ba190c25fd583050af3239a58b3ab04b1c2b2583920d203e6",
+        "license": "Apache-2.0",
+        "license_file": "XRechnung-Testsuite-LICENSE",
+        "derived": true,
+        "change": "Guideline-ID auf urn:cen.eu:en16931:2017 gesetzt",
+        "license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      }
+    },
+    {
+      "name": "zf-en16931-business-error",
+      "file": "zf-en16931-business-error.xml",
+      "sha256": "40c3e4771ed58b3aab1e51067302099e490dd11cf1af5ef8154eef3b79ab533d",
+      "profile": "ZUGFeRD 2.5.2 / Factur-X 1.09.2, EN16931/Comfort",
+      "purpose": "Guideline-ID auf urn:cen.eu:en16931:2017 und TypeCode auf 999 gesetzt",
+      "expected": {
+        "status": "E",
+        "accepted": false,
+        "schema_valid": true,
+        "processing_error": false,
+        "report_valid": false,
+        "required_findings": [
+          {
+            "code": "PEPPOL-EN16931-R008",
+            "level": "warning"
+          },
+          {
+            "code": "FX-SCH-A-000555",
+            "level": "error"
+          }
+        ]
+      },
+      "source": {
+        "repository": "https://github.com/itplr-kosit/xrechnung-testsuite",
+        "commit": "04cb0e80c14aaa4fb40c1118846570756dc534cd",
+        "original_path": "src/test/business-cases/standard/01.01a-INVOICE_uncefact.xml",
+        "original_sha256": "e58a673aa659973ba190c25fd583050af3239a58b3ab04b1c2b2583920d203e6",
+        "license": "Apache-2.0",
+        "license_file": "XRechnung-Testsuite-LICENSE",
+        "derived": true,
+        "change": "Guideline-ID auf urn:cen.eu:en16931:2017 und TypeCode auf 999 gesetzt",
+        "license_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      }
+    },
+    {
+      "name": "malformed",
+      "diagnostic_exception": "xml-unclosed-document",
+      "file": "malformed.xml",
+      "sha256": "c0be4e1a7c54b65189210e9140f93c418d381eb26bdb494173c4621bd39db631",
+      "profile": "Parser",
+      "purpose": "nicht geschlossener Elementbaum",
+      "expected": {
+        "status": "F",
+        "accepted": false,
+        "schema_valid": false,
+        "processing_error": true,
+        "report_valid": false,
+        "required_findings": []
+      },
+      "source": {
+        "kind": "synthetic",
+        "license": "Apache-2.0",
+        "license_file": "../../../LICENSE",
+        "change": "nicht geschlossener Elementbaum",
+        "license_sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+      }
+    },
+    {
+      "name": "unknown",
+      "file": "unknown.xml",
+      "sha256": "97db084ac09bd42db867bc862f538f14446bbaddd1155b353b5350084f588842",
+      "profile": "Szenarioauswahl",
+      "purpose": "wohlgeformtes XML ohne passendes Szenario",
+      "expected": {
+        "status": "E",
+        "accepted": false,
+        "schema_valid": false,
+        "processing_error": false,
+        "report_valid": false,
+        "required_findings": []
+      },
+      "source": {
+        "kind": "synthetic",
+        "license": "Apache-2.0",
+        "license_file": "../../../LICENSE",
+        "change": "wohlgeformtes XML ohne passendes Szenario",
+        "license_sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+      }
+    },
+    {
+      "name": "dtd",
+      "diagnostic_exception": "xml-doctype-forbidden",
+      "java_hash_exception": "doctype-read-prefix",
+      "file": "dtd.xml",
+      "sha256": "a2338aad0ab02b61fb5925b96a12162eea1fb65428ef7061a9417f7e2b2195cd",
+      "profile": "Parser-Sicherheit",
+      "purpose": "interne DTD mit verbotener Entity",
+      "expected": {
+        "status": "F",
+        "accepted": false,
+        "schema_valid": false,
+        "processing_error": true,
+        "report_valid": false,
+        "required_findings": []
+      },
+      "source": {
+        "kind": "synthetic",
+        "license": "Apache-2.0",
+        "license_file": "../../../LICENSE",
+        "change": "interne DTD mit verbotener Entity",
+        "license_sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+      }
+    },
+    {
+      "name": "dtd-prefix-hash",
+      "diagnostic_exception": "xml-doctype-forbidden",
+      "java_hash_exception": "doctype-read-prefix",
+      "file": "dtd-prefix-hash.xml",
+      "sha256": "6bbb8d533753b109649477f560df378d2e55091903ea0b3141bc314c5e09618b",
+      "profile": "Parser-Sicherheit",
+      "purpose": "DTD-Verbot vor langem Eingaberest: Java-Präfixhash und Delphi-Hash aller Originalbytes getrennt prüfen",
+      "expected": {
+        "status": "F",
+        "accepted": false,
+        "schema_valid": false,
+        "processing_error": true,
+        "report_valid": false,
+        "required_findings": []
+      },
+      "source": {
+        "kind": "synthetic",
+        "license": "Apache-2.0",
+        "license_file": "../../../LICENSE",
+        "change": "DTD-Verbot vor langem Eingaberest: Java-Präfixhash und Delphi-Hash aller Originalbytes getrennt prüfen",
+        "license_sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+      }
+    }
+  ]
+}

@@ -17,6 +17,7 @@ type
     FResourceRoots: TArray<string>;
     FSchemaCaches: TDictionary<string, IXMLDOMSchemaCollection2>;
     FMemoryResources: TDictionary<string, TBytes>;
+    FCheckedStylesheets: TDictionary<string, Boolean>;
     FSchemaCompilationCount: Integer;
     FSchemaCompilationMs, FSchemaValidationMs, FXPathMs, FTransformationMs, FDocumentParsingMs: Double;
     FDomMs: Double;
@@ -24,6 +25,8 @@ type
     function CreateDocument(const AllowInternalDtd: Boolean): IXMLDOMDocument3;
     function RequireReadableFile(const FileName: string): string;
     function RequireResourceFile(const FileName: string): string;
+    function RequireCheckedStylesheet(const FileName: string): string;
+    procedure CheckStylesheetResources(const FileName: string; const CheckedFiles: TDictionary<string, Boolean>);
     function LoadSchema(const FileName: string): IXMLDOMDocument3;
     function GetSchemaCache(const SchemaFiles: TArray<string>): IXMLDOMSchemaCollection2;
     function ValidateSchemaInstance(const XmlFile: string; const SchemaFiles: TArray<string>; out Diagnostic: string): Boolean;
@@ -49,7 +52,9 @@ type
     function Version: string;
     procedure RegisterMemoryResource(const ResourceUri: string; const Content: TBytes);
     function LoadDocumentBytes(const Content: TBytes; const BaseUri: string = ''): IXMLDOMDocument3;
-    function ValidateDocumentSchemas(const Document: IXMLDOMDocument3; const SchemaFiles: TArray<string>; out Diagnostic: string): Boolean;
+    function ValidateDocumentSchemas(const Document: IXMLDOMDocument3; const SchemaFiles: TArray<string>; out Diagnostic: string; const OriginalContent: TBytes = nil): Boolean;
+    function ValidateDocumentSchemaDiagnostics(const Document: IXMLDOMDocument3; const SchemaFiles: TArray<string>; out Diagnostics: TArray<string>;
+      const OriginalContent: TBytes = nil): Boolean;
     procedure BeginDocumentBytes(const Content: TBytes; const BaseUri: string);
     function EvaluateBooleanBytes(const Content: TBytes; const BaseUri, Expression: string; const Namespaces: TArray<string>): Boolean;
     function TransformBytes(const Content: TBytes; const BaseUri, StylesheetFile: string;
@@ -59,7 +64,7 @@ type
 implementation
 
 uses
-  System.Variants, System.IOUtils, System.StrUtils, System.RegularExpressions, System.Diagnostics, Winapi.ActiveX, System.Win.ComObj;
+  System.Variants, System.IOUtils, System.StrUtils, System.NetEncoding, System.RegularExpressions, System.Diagnostics, Winapi.ActiveX, Winapi.ShlwApi, System.Win.ComObj;
 
 const
   UnitName = 'MGKositEngine';
@@ -101,11 +106,13 @@ end;
 function CanonicalLocalPath(const FileName: string; const IsDirectory: Boolean): string;
 var
   FileHandle: THandle;
-  Flags, RequiredLength: DWORD;
+  Flags, RequiredLength, ErrorCode: DWORD;
+  RequestedPath: string;
 begin
   if Trim(FileName) = '' then
     raise EMGKositEngine.Create('Ein lokaler Dateipfad muss angegeben werden.');
   Result := ExpandFileName(FileName);
+  RequestedPath := Result;
   if StartsText('\\', Result) then
     raise EMGKositEngine.Create('Netzwerkpfade sind für die Validierung nicht erlaubt: ' + Result);
   Flags := FILE_ATTRIBUTE_NORMAL;
@@ -113,12 +120,21 @@ begin
     Flags := FILE_FLAG_BACKUP_SEMANTICS;
   FileHandle := CreateFile(PChar(ExtendedLocalPath(Result)), 0, FILE_SHARE_READ or FILE_SHARE_WRITE or FILE_SHARE_DELETE, nil, OPEN_EXISTING, Flags, 0);
   if FileHandle = INVALID_HANDLE_VALUE then
-    RaiseLastOSError;
+  begin
+    // Die Systemmeldung allein nennt weder den fehlenden Import noch seine Herkunft.
+    ErrorCode := GetLastError;
+    raise EMGKositEngine.CreateFmt('Lokale Ressource fehlt oder ist nicht lesbar: %s (Systemfehler %d: %s)',
+      [RequestedPath, ErrorCode, SysErrorMessage(ErrorCode)]);
+  end;
   try
     SetLength(Result, 32768);
     RequiredLength := GetFinalPathNameByHandle(FileHandle, PChar(Result), Length(Result), 0);
     if RequiredLength = 0 then
-      RaiseLastOSError;
+    begin
+      ErrorCode := GetLastError;
+      raise EMGKositEngine.CreateFmt('Lokaler Ressourcenpfad kann nicht aufgelöst werden: %s (Systemfehler %d: %s)',
+        [RequestedPath, ErrorCode, SysErrorMessage(ErrorCode)]);
+    end;
     if RequiredLength >= DWORD(Length(Result)) then
       raise EMGKositEngine.Create('Der aufgelöste Dateipfad überschreitet die unterstützte Länge.');
     SetLength(Result, RequiredLength);
@@ -159,6 +175,7 @@ begin
   FNative := TMGKositNative.Create(SaxonLibraryFile);
   FSchemaCaches := TDictionary<string, IXMLDOMSchemaCollection2>.Create;
   FMemoryResources := TDictionary<string, TBytes>.Create;
+  FCheckedStylesheets := TDictionary<string, Boolean>.Create;
 end;
 
 // Kompilierte Schemas und alle übrigen COM-Objekte werden vor CoUninitialize freigegeben.
@@ -168,6 +185,7 @@ begin
   try
     FreeAndNil(FSchemaCaches);
     FreeAndNil(FMemoryResources);
+    FreeAndNil(FCheckedStylesheets);
     FreeAndNil(FNative);
   finally
     if FMustUninitialize then
@@ -184,6 +202,7 @@ procedure TMGKositEngine.Close;
 begin
   RequireOwnerThread;
   FSchemaCaches.Clear;
+  FCheckedStylesheets.Clear;
   FNative.Close;
 end;
 
@@ -253,6 +272,7 @@ begin
   FResourceRoots := Roots;
   // Geänderte Freigaben dürfen keine bereits kompilierten Schemas überleben.
   FSchemaCaches.Clear;
+  FCheckedStylesheets.Clear;
 end;
 
 // Datei-I/O-Fehler dürfen keine fachlich ungültige XML-Instanz vortäuschen.
@@ -297,6 +317,100 @@ begin
   raise EMGKositEngine.Create('Die Regelressource liegt außerhalb der konfigurierten Verzeichnisse: ' + Result);
 end;
 
+// Nur das bereits kompilierte Hauptstylesheet darf seinen geprüften Importgraphen wiederverwenden.
+// Bei einem neuen Hauptstylesheet werden auch schon anderweitig verwendete Imports erneut geprüft, da Saxon sie neu einliest.
+function TMGKositEngine.RequireCheckedStylesheet(const FileName: string): string;
+var
+  CheckedFiles: TDictionary<string, Boolean>;
+begin
+  Result := RequireResourceFile(FileName);
+  if FCheckedStylesheets.ContainsKey(Result) then Exit;
+  CheckedFiles := TDictionary<string, Boolean>.Create;
+  try
+    CheckStylesheetResources(Result, CheckedFiles);
+  finally
+    FreeAndNil(CheckedFiles);
+  end;
+end;
+
+// Windows löst lokale URI-Referenzen einschließlich Prozentkodierung und xml:base wie der Stylesheetprozessor auf.
+function StylesheetReferencePath(const FileName: string; const Reference: IXMLDOMElement): string;
+var
+  Buffer: string;
+  BufferLength: DWORD;
+  BaseUri, Location: string;
+
+  // Die Reihenfolge beginnt am Dokumentelement, damit nähere xml:base-Angaben auf der geerbten Basis aufbauen.
+  procedure ApplyBase(const Node: IXMLDOMNode);
+  var
+    BaseAttribute: IXMLDOMNode;
+  begin
+    if Node = nil then Exit;
+    ApplyBase(Node.parentNode);
+    if Node.attributes = nil then Exit;
+    BaseAttribute := Node.attributes.getNamedItem('xml:base');
+    if BaseAttribute = nil then Exit;
+    BufferLength := 32768;
+    SetLength(Buffer, BufferLength);
+    if Failed(UrlCombine(PChar(BaseUri), PChar(BaseAttribute.text), PChar(Buffer), BufferLength, 0)) then
+      raise EMGKositEngine.Create('Die Stylesheet-Basis kann nicht aufgelöst werden: ' + string(BaseAttribute.text));
+    BaseUri := PChar(Buffer);
+  end;
+
+begin
+  BufferLength := 32768;
+  SetLength(Buffer, BufferLength);
+  if Failed(UrlCreateFromPath(PChar(FileName), PChar(Buffer), @BufferLength, 0)) then
+    raise EMGKositEngine.Create('Die lokale Stylesheet-URI kann nicht gebildet werden: ' + FileName);
+  BaseUri := PChar(Buffer);
+  ApplyBase(Reference);
+  Location := VarToStr(Reference.getAttribute('href'));
+  BufferLength := 32768;
+  SetLength(Buffer, BufferLength);
+  if Failed(UrlCombine(PChar(BaseUri), PChar(Location), PChar(Buffer), BufferLength, 0)) then
+    raise EMGKositEngine.Create('Die Stylesheet-Referenz kann nicht aufgelöst werden: ' + Location);
+  BaseUri := PChar(Buffer);
+  // Andere Protokolle werden unverändert durch das Native-Protokollverbot diagnostiziert.
+  if not StartsText('file:', BaseUri) then Exit('');
+  // Datei-URIs kodieren UTF-8. Die ANSI-Dekodierung von PathCreateFromUrl verändert beispielsweise ä.
+  // Ein Pluszeichen ist im URI-Pfad ein Dateinamenbestandteil und kein Formular-Leerzeichen.
+  BaseUri := TNetEncoding.URL.Decode(StringReplace(BaseUri, '+', '%2B', [rfReplaceAll]));
+  if StartsText('file:///', BaseUri) then
+    Result := Copy(BaseUri, 9, MaxInt)
+  else if StartsText('file://', BaseUri) then
+    Result := '\\' + Copy(BaseUri, 8, MaxInt)
+  else
+  begin
+    Result := Copy(BaseUri, 6, MaxInt);
+    if StartsText('/', Result) then Delete(Result, 1, 1);
+  end;
+  Result := StringReplace(Result, '/', '\', [rfReplaceAll]);
+end;
+
+// Auch nachgeladene Stylesheets müssen innerhalb der freigegebenen Wurzeln liegen.
+procedure TMGKositEngine.CheckStylesheetResources(const FileName: string; const CheckedFiles: TDictionary<string, Boolean>);
+var
+  AbsoluteFileName, ImportedFile: string;
+  Document: IXMLDOMDocument3;
+  References: IXMLDOMNodeList;
+  ReferenceIndex: Integer;
+begin
+  AbsoluteFileName := RequireResourceFile(FileName);
+  if CheckedFiles.ContainsKey(AbsoluteFileName) then Exit;
+  CheckedFiles.Add(AbsoluteFileName, True);
+  Document := LoadDocument(AbsoluteFileName);
+  Document.setProperty('SelectionNamespaces', 'xmlns:xsl="http://www.w3.org/1999/XSL/Transform"');
+  if Document.selectSingleNode('//xsl:result-document') <> nil then
+    raise EMGKositEngine.Create('xsl:result-document ist für lokale Validierungsregeln nicht erlaubt: ' + AbsoluteFileName);
+  References := Document.selectNodes('/xsl:stylesheet/xsl:include | /xsl:stylesheet/xsl:import | /xsl:transform/xsl:include | /xsl:transform/xsl:import');
+  for ReferenceIndex := 0 to References.length - 1 do
+  begin
+    ImportedFile := StylesheetReferencePath(AbsoluteFileName, References.item[ReferenceIndex] as IXMLDOMElement);
+    if ImportedFile <> '' then
+      CheckStylesheetResources(ImportedFile, CheckedFiles);
+  end;
+end;
+
 // DTD-Freigaben gelten ausschließlich für bereits auf das Repository begrenzte XSD-Dateien.
 function TMGKositEngine.CreateDocument(const AllowInternalDtd: Boolean): IXMLDOMDocument3;
 begin
@@ -307,6 +421,7 @@ begin
   Result.resolveExternals := False;
   Result.setProperty('ProhibitDTD', not AllowInternalDtd);
   Result.setProperty('UseInlineSchema', False);
+  Result.setProperty('MultipleErrorMessages', True);
 end;
 
 // Konfigurationen und Instanzen werden ohne DTD, externe Ressourcen und Inline-Schemas gelesen.
@@ -644,6 +759,8 @@ begin
   InstanceDocument := CreateDocument(False);
   SchemaCacheVariant := IDispatch(SchemaCache);
   InstanceDocument.schemas := SchemaCacheVariant;
+  // Schemafehler müssen beim Parsen entstehen, weil DOM.validate die Quellposition verwirft.
+  InstanceDocument.validateOnParse := True;
   VarClear(SchemaCacheVariant);
   if not LoadDomBytes(InstanceDocument, ReadFileBytes(AbsoluteXmlFile)) then
   begin
@@ -690,7 +807,7 @@ end;
 // Nur Stylesheets aus freigegebenen Regelverzeichnissen werden ausgeführt.
 procedure TMGKositEngine.Transform(const XmlFile, StylesheetFile, OutputFile: string; const InputDocumentFile: string);
 var
-  ParameterFile: string;
+  ParameterFile, ResourceName: string;
   Watch: TStopwatch;
 begin
   RequireOwnerThread;
@@ -699,7 +816,10 @@ begin
     ParameterFile := '';
     if InputDocumentFile <> '' then
       ParameterFile := RequireReadableFile(InputDocumentFile);
-    FNative.Transform(RequireReadableFile(XmlFile), RequireResourceFile(StylesheetFile), OutputFile, ParameterFile);
+    ResourceName := RequireCheckedStylesheet(StylesheetFile);
+    FNative.Transform(RequireReadableFile(XmlFile), ResourceName, OutputFile, ParameterFile);
+    // Ein Compilerfehler darf noch keine Sicherheitsfreigabe für eine später reparierte Datei hinterlassen.
+    FCheckedStylesheets.AddOrSetValue(ResourceName, True);
   finally
     FTransformationMs := FTransformationMs + Watch.Elapsed.TotalMilliseconds;
   end;
@@ -719,6 +839,8 @@ begin
   if (ResourceUri = '') or (Length(Content) = 0) then
     raise EMGKositEngine.Create('Eine Speicherressource benötigt URI und Inhalt');
   FNative.RegisterMemoryStylesheet(ResourceUri, Content);
+  // RegisterMemoryStylesheet verwirft sämtliche Native-Kompilate, einschließlich lokaler Stylesheets.
+  FCheckedStylesheets.Clear;
   FMemoryResources.AddOrSetValue(ResourceUri, Copy(Content));
   FSchemaCaches.Clear;
 end;
@@ -820,19 +942,33 @@ begin
   end;
 end;
 
-// Ein bereits sicher geladenes DOM wird ohne erneutes Parsen gegen den kompilierten Cache geprüft.
-function TMGKositEngine.ValidateDocumentSchemas(const Document: IXMLDOMDocument3; const SchemaFiles: TArray<string>; out Diagnostic: string): Boolean;
+// Originalbytes erhalten ihre Parserpositionen; für erzeugte DOMs gilt ihre XML-Serialisierung als Quelle.
+function TMGKositEngine.ValidateDocumentSchemas(const Document: IXMLDOMDocument3; const SchemaFiles: TArray<string>; out Diagnostic: string;
+  const OriginalContent: TBytes): Boolean;
+var
+  Diagnostics: TArray<string>;
+begin
+  Result := ValidateDocumentSchemaDiagnostics(Document, SchemaFiles, Diagnostics, OriginalContent);
+  Diagnostic := string.Join(sLineBreak, Diagnostics);
+end;
+
+// Jeder vom Parser gemeldete Schemafehler bleibt als eigene Diagnose erhalten, auch bei identischer Fehlerart.
+function TMGKositEngine.ValidateDocumentSchemaDiagnostics(const Document: IXMLDOMDocument3; const SchemaFiles: TArray<string>; out Diagnostics: TArray<string>;
+  const OriginalContent: TBytes): Boolean;
 var
   SchemaCache: IXMLDOMSchemaCollection2;
+  ValidationDocument: IXMLDOMDocument3;
   Source, PreviousSchemas: OleVariant;
   ParseError: IXMLDOMParseError;
-  NamespaceIndex: Integer;
-  RootNamespaceKnown: Boolean;
+  ExtendedError: IXMLDOMParseError2;
+  ParseErrors: IXMLDOMParseErrorCollection;
+  NamespaceIndex, ErrorIndex: Integer;
+  RootNamespaceKnown, Loaded: Boolean;
   Watch: TStopwatch;
 begin
   RequireOwnerThread;
   Result := False;
-  Diagnostic := '';
+  Diagnostics := nil;
   if (Document = nil) or (Document.documentElement = nil) then
     raise EMGKositEngine.Create('Die Schema-Validierung benötigt ein XML-Dokument mit Wurzelelement');
   Watch := TStopwatch.StartNew;
@@ -844,24 +980,37 @@ begin
         RootNamespaceKnown := True;
     if not RootNamespaceKnown then
     begin
-      Diagnostic := 'Für den Instanz-Namespace ist kein Schema konfiguriert: ' + string(Document.documentElement.namespaceURI);
+      Diagnostics := ['Für den Instanz-Namespace ist kein Schema konfiguriert: ' + string(Document.documentElement.namespaceURI)];
       Exit;
     end;
-    PreviousSchemas := Document.schemas;
+    ValidationDocument := CreateDocument(False);
+    ValidationDocument.validateOnParse := True;
+    PreviousSchemas := ValidationDocument.schemas;
     Source := IDispatch(SchemaCache);
     try
-      Document.schemas := Source;
-      ParseError := Document.validate;
+      ValidationDocument.schemas := Source;
+      if OriginalContent = nil then
+        Loaded := ValidationDocument.loadXML(Document.xml)
+      else
+        Loaded := LoadDomBytes(ValidationDocument, OriginalContent);
+      if not Loaded then
+        ParseError := ValidationDocument.parseError
+      else
+        ParseError := ValidationDocument.validate;
       if Integer(ParseError.errorCode) <> 0 then
       begin
-        Diagnostic := DescribeParseError(ParseError);
         if not IsXmlContentError(Integer(ParseError.errorCode)) then
-          raise EMGKositEngine.Create('Die Schema-Validierung ist fehlgeschlagen. ' + Diagnostic);
+          raise EMGKositEngine.Create('Die Schema-Validierung ist fehlgeschlagen. ' + DescribeParseError(ParseError));
+        ExtendedError := ParseError as IXMLDOMParseError2;
+        ParseErrors := ExtendedError.allErrors;
+        SetLength(Diagnostics, ParseErrors.length);
+        for ErrorIndex := 0 to ParseErrors.length - 1 do
+          Diagnostics[ErrorIndex] := DescribeParseError(ParseErrors.item[ErrorIndex]);
         Exit;
       end;
       Result := True;
     finally
-      Document.schemas := PreviousSchemas;
+      ValidationDocument.schemas := PreviousSchemas;
       VarClear(Source);
       VarClear(PreviousSchemas);
     end;
@@ -904,15 +1053,19 @@ function TMGKositEngine.TransformBytes(const Content: TBytes; const BaseUri, Sty
 var
   ResourceName: string;
   Watch: TStopwatch;
+  IsLocalStylesheet: Boolean;
 begin
   RequireOwnerThread;
   Watch := TStopwatch.StartNew;
   try
-    if FMemoryResources.ContainsKey(StylesheetFile) then
+    IsLocalStylesheet := not FMemoryResources.ContainsKey(StylesheetFile);
+    if not IsLocalStylesheet then
       ResourceName := StylesheetFile
     else
-      ResourceName := RequireResourceFile(StylesheetFile);
+      ResourceName := RequireCheckedStylesheet(StylesheetFile);
     Result := FNative.TransformBytes(Content, BaseUri, ResourceName, BaseUri, InputDocument, InputDocumentBaseUri);
+    if IsLocalStylesheet then
+      FCheckedStylesheets.AddOrSetValue(ResourceName, True);
   finally
     FTransformationMs := FTransformationMs + Watch.Elapsed.TotalMilliseconds;
   end;

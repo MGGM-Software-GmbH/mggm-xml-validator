@@ -58,7 +58,7 @@ var
   Index, Separator, RepositoryIndex, ScenarioIndex: Integer;
   Argument, Value, Name, LogLevel: string;
   Scenario: TScenarioArgument;
-  Positional: Boolean;
+  Positional, SharedRepository: Boolean;
 begin
   Index := 1;
   RepositoryIndex := 0;
@@ -108,7 +108,7 @@ begin
         Name := '#' + IntToStr(RepositoryIndex);
       end;
       if (Name = '') or not DirectoryExists(Value) or FRepositories.ContainsKey(Name) then
-        raise EKositArguments.Create('Ungültiges oder doppeltes Repository: ' + Name);
+        raise EKositArguments.Create('Ungültiges oder doppeltes Repository: ' + Name + ' (' + Value + ')');
       FRepositories.Add(Name, ExpandFileName(Value));
     end
     else if (Argument = '-o') or (Argument = '--output-directory') then
@@ -148,14 +148,19 @@ begin
     raise EKositArguments.Create('--json und --print können nicht gemeinsam verwendet werden');
   if not FHelp and ((FScenarios.Count = 0) or (FInputs.Count = 0)) then
     raise EKositArguments.Create('Mindestens eine Szenariodatei (-s) und eine Eingabe sind erforderlich');
+  // Ein einzelnes unbenanntes -r weist allen Definitionen ausdrücklich dasselbe Ressourcenverzeichnis zu.
+  SharedRepository := (FRepositories.Count = 1) and FRepositories.ContainsKey('#1');
+  for Scenario in FScenarios do
+    if (FRepositories.Count > 0) and not SharedRepository and not FRepositories.ContainsKey(Scenario.Name) then
+      raise EKositArguments.Create('Repository für Szenariodefinition fehlt: ' + Scenario.Name);
   for Name in FRepositories.Keys do
   begin
     Positional := False;
     for Scenario in FScenarios do
       if Name = Scenario.Name then
         Positional := True;
-    if not Positional then
-      raise EKositArguments.Create('Repository ohne zugehörige Szenariodatei: ' + Name);
+    if not Positional and not SharedRepository then
+      WriteLn(ErrOutput, 'Warnung: Repositorydefinition wird nicht verwendet: ' + Name);
   end;
 end;
 
@@ -291,10 +296,11 @@ var
   Nodes: IXMLDOMNodeList;
   Node: IXMLDOMNode;
   Namespaces: TArray<string>;
-  Index, NamespaceCount: Integer;
+  Index, NamespaceCount, PreviousAssertionCount: Integer;
   ReportDocument, Test: string;
 begin
   Result := 0;
+  PreviousAssertionCount := FAssertionCount;
   if (Document.documentElement.namespaceURI <> 'http://www.xoev.de/de/validator/framework/1/assertions') or
      (Document.documentElement.baseName <> 'assertions') then
     raise EKositArguments.Create('Die Assertions-Datei besitzt kein gültiges assertions-Wurzelelement');
@@ -330,6 +336,9 @@ begin
       end;
     end;
   end;
+  // Ohne Zuordnung wurde keine Assertion ausgeführt; dies darf nicht still als Prüfung erscheinen.
+  if FAssertionCount = PreviousAssertionCount then
+    WriteLn(ErrOutput, 'Keine Assertions für Bericht: ' + ReportFile);
 end;
 
 // Akzeptanz und technische Fehler bleiben im maschinenlesbaren Ergebnis unabhängig.
@@ -432,7 +441,12 @@ begin
       for Scenario in FScenarios do
       begin
         if not FRepositories.TryGetValue(Scenario.Name, Repository) then
-          Repository := '';
+        begin
+          if (FRepositories.Count = 1) and FRepositories.ContainsKey('#1') then
+            Repository := FRepositories['#1']
+          else
+            Repository := '';
+        end;
         Validator.AddScenario(Scenario.FileName, Repository);
       end;
       if FDebug then
@@ -531,6 +545,7 @@ begin
       on Error: EKositArguments do
       begin
         WriteLn(ErrOutput, Error.Message);
+        WriteLn(ErrOutput, 'Aufruf: MGGMXmlValidator -s scenarios.xml -o verzeichnis datei.xml');
         Result := 2;
       end;
     end;

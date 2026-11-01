@@ -6,7 +6,9 @@ Die Tests des eigenständigen MGGM XML Validators für Delphi sollen gezielt Feh
 die zu falscher Annahme, verlorenen Befunden, unbrauchbaren Berichten oder unsicherem
 Ressourcenzugriff führen. Eine höhere Testzahl ist kein eigenes Ziel.
 
-Dieses PRP beschreibt die spätere Umsetzung. Es erweitert weder Tests noch Produktcode.
+Dieses PRP legt den fachlichen Prüfauftrag und die Abnahmekriterien fest. Die konkrete
+Zuordnung steht in der [Methodenmatrix](METHODENMATRIX.md); aktuelle Laufnachweise und
+festgestellte Grenzen stehen in [RESULTATE.md](RESULTATE.md).
 Originaltests für Server, Daemon und HTTP-Endpunkte werden nicht übernommen.
 Java dient ausschließlich als Referenz im Entwicklungsprozess, nicht als Delphi-Laufzeitabhängigkeit.
 
@@ -17,27 +19,13 @@ Es wird kein neues Testframework und keine Nachbildung interner Java-Klassen mit
 ## Quellen und gesicherter Bestand
 
 Maßgebliche Projektquellen sind [TESTING.md](../../TESTING.md), die Programme unter
-`Tests`, `compare_reports.py` und [publication-verification.json](../../../Tests/publication-verification.json).
-Der Prüfnachweis dokumentiert die folgenden vorhandenen Suite-Ergebnisse für Delphi 11 und 13,
-jeweils für Win64. Das PRP selbst führt diese Tests nicht aus:
-
-| Suite | Dokumentiertes Ergebnis | Bestehender Schwerpunkt |
-|---|---|---|
-| `EngineTests` | 38/38 | Parser, lokale XSD-Auflösung, Cache, Langpfade, Sicherheitsgrenzen |
-| `PipelineTests` | 16/16 | Szenarien, Annahme, Status, Berichte, Fehler und Stream-Eingabe |
-| `CliTests` | 16/16 | CLI-Aufrufe, Assertions, Ausgabeverhalten und Fehler |
-| `StreamAdapterTests` | 4/4 | Stream-Anbindung |
-| `NativeReuseTests` | 20/20 | Kontextwechsel, Wiederverwendung, Fehlererholung und Serialisierung |
-| `MemoryTransferTests` | 14/14 | Speicherübergabe, Eingabeposition, Encodings, Betrieb ohne Tempdateien |
-| `ParallelEngineTests` | 16 Aufrufe, 8 überlappende Runden | Parallele isolierte Validierungen |
-| `DelphiExampleTests` | 17/17 | Beispielprogramm, Pfade, fehlende Voraussetzungen und Ausgabeschutz |
-| Python | 81/81 | Paketierung, Quellpaket, Ressourcen und Auswertungswerkzeuge |
-| Berichtskorpus | 23/23 | Normierte Regression gegen gesicherten Bestand, kein erneuter Java-Lauf |
-
-Die Fallzahlen belegen keine lückenlose Übernahme der Originalsemantik.
-`PipelineTests` nennt bereits Originalmethoden in `SourceExpectation`, beispielsweise
-`DefaultCheckTest.testHappyCase`, `testRejectAcceptMatch` und `testSchematronExecutionError`.
-Diese Hinweise sind Ausgangspunkte für die Inventur, keine pauschale Abdeckungszusage.
+`Tests`, `compare_reports.py`, `verify_original_test_inventory.py`, die
+[maschinenlesbare Methodenmatrix](original-method-matrix.json) und
+[publication-verification.json](../../../Tests/publication-verification.json).
+Die Ergebnisse der einzelnen Compilerläufe werden in [RESULTATE.md](RESULTATE.md)
+mit Lauf- und Artefaktbezug zusammengeführt. Fallzahlen belegen keine lückenlose
+Übernahme der Originalsemantik; dafür sind die Verträge und konkreten Assertions
+der Methodenmatrix maßgeblich.
 
 Referenz ist [KoSIT validator v1.6.3](https://github.com/itplr-kosit/validator/tree/v1.6.3),
 Commit `37cddce28e15ac3a0319db006ab21d3f1064ca8c`.
@@ -109,7 +97,7 @@ Regeln und denselben erwarteten Befunden werden nicht allein zur Vergrößerung 
 
 ## Deliverable: Methodenmatrix des Originals
 
-In der Umsetzung entsteht eine versionierte Matrix neben diesem PRP. Jede Original-Testmethode
+Die versionierte [Matrix](original-method-matrix.json) liegt neben diesem PRP. Jede Original-Testmethode
 aus `src/test/java` erhält einen Eintrag; parametrisierte Methoden nennen zusätzlich die
 fachlich unterschiedlichen Varianten. Die Inventur berücksichtigt Testannotationen,
 Vererbung und Datenquellen, nicht nur Dateinamen oder ausgeführte Fallzahlen.
@@ -133,13 +121,12 @@ Vor der Abnahme bleiben keine ungeklärten Zuordnungen und keine unbelegten `cov
 
 ## Referenzvergleich und aussagekräftige Gegenproben
 
-`compare_reports.py` wird erweitert, ohne echte Abweichungen wegzunormalisieren.
-Der vorhandene Vergleich erfasst unter anderem Szenario, Annahme, Schritte, Schematron-Befunde,
-Dokumentdaten und Hash. XML-Schema- und Parserdiagnosen werden bislang nicht als Befundmenge verglichen.
-Die vorhandene DTD-Hashausnahme ist ausdrücklich zu bewerten und separat nachzuweisen.
-Eine isolierte Gegenprobe mit leerem Manifest liefert derzeit Exitcode 0 bei 0/0 Fällen
-und nicht ausgeführter Befund-Gegenprobe. Der Ausbau muss leere Korpora, fehlende Referenzberichte
-und nicht ausgeführte vorgeschriebene Gegenproben als Fehler erkennen.
+`compare_reports.py` setzt den folgenden Vergleichsvertrag um, ohne echte Abweichungen
+wegzunormalisieren. XML-Schema- und Parserdiagnosen gehören ebenso dazu wie Schematron-Befunde.
+Die eng begrenzten Diagnoseklassen und die Java-Präfixhashausnahme bei DTD-Abbruch sind
+im Vergleichswerkzeug ausdrücklich benannt und werden mit den Originalbytes geprüft.
+Leere Korpora, fehlende Referenzberichte und nicht ausgeführte vorgeschriebene Gegenproben
+müssen als Fehler erkannt werden. Die aktuellen Nachweise stehen in [RESULTATE.md](RESULTATE.md).
 
 Der neue Vergleichsvertrag umfasst:
 
@@ -190,9 +177,10 @@ Einrichtung und gesonderter Referenzlauf dürfen benötigte öffentliche Artefak
 Version und Hash müssen vor Verwendung geprüft werden. Fehlende Voraussetzungen erzeugen
 einen sichtbaren Fehler, keinen erfolgreichen übersprungenen Vergleich.
 
-`docs/TESTING.md` wird um genaue Befehle, Arbeitsverzeichnisse und Ergebnisdateien ergänzt.
+[TESTING.md](../../TESTING.md) beschreibt genaue Befehle, Arbeitsverzeichnisse und Ergebnisdateien.
 Zu protokollieren sind Delphi-Version, Win64-Konfiguration, DLL-Version und -Hash,
-Python-Version, Java-/Maven-Version im Referenzlauf, Regel- und Fixture-Hashes sowie Lauf-IDs.
+Python-Version, Java-Version und die tatsächliche Maven-Verwendung im Referenzlauf,
+Regel- und Fixture-Hashes sowie Lauf-IDs. Der ausgewählte lokale JAR-Lauf benötigt Maven nicht.
 Die geprüften Compiler sind Delphi 11 Alexandria und Delphi 13 Florence, jeweils für Win64.
 Weitere Compiler-Versionen und Plattformen gelten erst nach eigenen Läufen als geprüft.
 Delphi-Builds und Teststarts verwenden den verfügbaren dokumentierten Buildzugang.
@@ -230,9 +218,7 @@ Abnahmebedingungen der Umsetzung:
 Die Methodenmatrix kann zusätzliche öffentliche Verträge oder echte Unterschiede zwischen den
 Engines offenlegen. Unklare Verträge, nicht verfügbare Regeln oder ungeklärte Fixture-Lizenzen
 benötigen eine konkrete Entscheidung; sie werden nicht durch erfundene Erwartungen ersetzt.
-Original-Fixtures sind bislang teilweise externe Voraussetzungen. Ihre lizenzierte und
-versionierte Bereitstellung ist daher Teil der Umsetzung, kein vorhandener Repository-Nachweis.
-
-Grobe Schätzung: 4 bis 8 Stunden Agentenbearbeitungszeit für Inventur, gezielte Tests,
-Vergleich, Gegenproben und Dokumentation bei verfügbarem Buildzugang und verwendbaren Fixtures.
-Dabei entdeckte Produktfehler sowie fehlende Lizenzen, Zugänge oder Regelpakete sind darin nicht enthalten.
+Die versionierten Referenz-Fixtures enthalten Lizenz- und Herkunftsnachweise.
+Regelpakete, Java-JAR, native DLL und Compiler bleiben lokale Voraussetzungen.
+Ihre Identität und die tatsächlich geprüften Ergebnisse sind pro Lauf nachzuweisen;
+die Veröffentlichung der Quellen ersetzt keinen Lauf auf weiteren Plattformen.

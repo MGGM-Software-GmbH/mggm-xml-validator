@@ -3,7 +3,7 @@
 {$APPTYPE CONSOLE}
 
 uses
-  System.SysUtils, System.Classes, System.IOUtils, System.JSON, System.StrUtils,
+  System.SysUtils, System.Classes, System.IOUtils, System.JSON, System.StrUtils, System.RegularExpressions,
   Winapi.Windows, Winapi.MSXML, MGKositEngine, MGKositNative;
 
 type
@@ -20,11 +20,14 @@ type
     procedure Require(const Condition: Boolean; const MessageText: string);
     procedure RunCase(const Name: string; const Action: TProc);
     procedure RequireNativeFailure(const Action: TProc; const DiagnosticTokens: array of string);
+    procedure RequireEngineFailure(const Action: TProc; const Tokens: array of string);
     procedure CheckSchema(const InstanceFile: string; const SchemaFiles: TArray<string>; const ExpectedValid: Boolean);
     procedure CheckForeignThread;
     procedure CheckSchemaReuse;
     procedure CheckLongPaths;
     procedure CheckSchemaRedefinition;
+    procedure CheckResolverContracts;
+    procedure CheckByteStylesheetContracts;
     procedure ExecuteCases;
   public
     constructor Create(const EvidenceFile, FixtureRoot: string);
@@ -469,6 +472,299 @@ begin
   end;
 end;
 
+// Die Diagnose muss die konkrete Ursache benennen, danach wird derselbe Prozessor erneut verwendet.
+procedure TEngineTestSuite.RequireEngineFailure(const Action: TProc; const Tokens: array of string);
+var
+  Rejected: Boolean;
+  ErrorText, Token: string;
+  Document: IXMLDOMDocument3;
+begin
+  Rejected := False;
+  try
+    Action();
+  except
+    on Error: Exception do
+    begin
+      Rejected := True;
+      ErrorText := Error.ClassName + ': ' + Error.Message;
+    end;
+  end;
+  Require(Rejected, 'Die verbotene oder fehlende Ressource wurde akzeptiert.');
+  for Token in Tokens do
+    Require(ContainsText(ErrorText, Token), 'Die Diagnose enthält "' + Token + '" nicht: ' + ErrorText);
+  FEngine.Transform(Fixture('base.xml'), Fixture('identity.xsl'), FOutputFile);
+  Document := FEngine.LoadDocument(FOutputFile);
+  Require(Document.documentElement.text = 'ok', 'Die lokale Transformation nach dem Fehler liefert falschen Inhalt.');
+  FDiagnostic := ErrorText;
+end;
+
+// Die Originalvarianten bleiben getrennt: ähnliche Fehlermeldungen ersetzen keine ausgeführte Ressource.
+procedure TEngineTestSuite.CheckResolverContracts;
+const
+  Header = '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">';
+var
+  DirectoryName, OutsideDirectory, StylesheetFile, ResultFile, LocalFile, SchemaFile: string;
+
+  // Jeder Angriff erhält ein eigenes Ausgabeziel; eine vorangegangene Ausgabe kann keinen Erfolg vortäuschen.
+  procedure CheckStylesheet(const Name, Body: string; const Tokens: array of string);
+  var
+    DiagnosticTokens: TArray<string>;
+    TokenIndex: Integer;
+  begin
+    SetLength(DiagnosticTokens, Length(Tokens));
+    for TokenIndex := 0 to High(Tokens) do
+      DiagnosticTokens[TokenIndex] := Tokens[TokenIndex];
+    StylesheetFile := TPath.Combine(DirectoryName, Name + '.xsl');
+    ResultFile := TPath.Combine(DirectoryName, Name + '-recovered.xml');
+    TFile.WriteAllText(StylesheetFile, Header + Body + '</xsl:stylesheet>', TEncoding.UTF8);
+    RunCase(Name,
+      procedure
+      begin
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.Transform(Fixture('base.xml'), StylesheetFile, TPath.Combine(DirectoryName, Name + '-forbidden.xml'));
+          end, DiagnosticTokens);
+        Require(not TFile.Exists(TPath.Combine(DirectoryName, 'ref.xml')), 'Das verbotene Nebenresultat ref.xml wurde geschrieben.');
+        Require(not TFile.Exists(TPath.Combine(DirectoryName, Name + '-forbidden.xml')), 'Eine abgelehnte Transformation hat eine Ergebnisdatei geschrieben.');
+      end);
+  end;
+
+begin
+  DirectoryName := TPath.Combine(ExtractFileDir(FEvidenceFile), 'resolver-contracts-' + TPath.GetRandomFileName);
+  OutsideDirectory := TPath.Combine(ExtractFileDir(FEvidenceFile), 'resolver-outside-' + TPath.GetRandomFileName);
+  ForceDirectories(DirectoryName);
+  ForceDirectories(OutsideDirectory);
+  LocalFile := TPath.Combine(DirectoryName, 'allowed.xml');
+  TFile.WriteAllText(LocalFile, '<allowed>local-absolute-content</allowed>', TEncoding.UTF8);
+  FEngine.ConfigureResourceRoots([FValidationRoot, FFixtures, DirectoryName]);
+  try
+    ResultFile := TPath.Combine(DirectoryName, 'recovered.xml');
+    RunCase('absolute-local-resource',
+      procedure
+      begin
+        Require(FEngine.EvaluateBoolean(Fixture('base.xml'), 'string(doc("file:///' + StringReplace(LocalFile, '\', '/', [rfReplaceAll]) + '")/*) = "local-absolute-content"', nil),
+          'Die absolute lokale Ressource enthält nicht den erwarteten Inhalt.');
+      end);
+    ForceDirectories(TPath.Combine(DirectoryName, 'parts'));
+    TFile.WriteAllText(TPath.Combine(DirectoryName, 'parts\local include ä.xsl'), Header +
+      '<xsl:template match="/"><included>local-include-content</included></xsl:template></xsl:stylesheet>', TEncoding.UTF8);
+    RunCase('local-stylesheet-include-with-xml-base-and-percent-encoding',
+      procedure
+      var
+        Document: IXMLDOMDocument3;
+      begin
+        StylesheetFile := TPath.Combine(DirectoryName, 'allowed-include.xsl');
+        TFile.WriteAllText(StylesheetFile, Header + '<xsl:include xml:base="parts/" href="local%20include%20%C3%A4.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+        FEngine.Transform(Fixture('base.xml'), StylesheetFile, ResultFile);
+        Document := FEngine.LoadDocument(ResultFile);
+        Require(Document.documentElement.text = 'local-include-content', 'Der erlaubte lokale Include lieferte falschen Inhalt.');
+      end);
+    RunCase('absolute-local-stylesheet-include',
+      procedure
+      var
+        Document: IXMLDOMDocument3;
+      begin
+        StylesheetFile := TPath.Combine(DirectoryName, 'absolute-include.xsl');
+        TFile.WriteAllText(StylesheetFile, Header + '<xsl:include href="file:///' +
+          StringReplace(TPath.Combine(DirectoryName, 'allowed-include.xsl'), '\', '/', [rfReplaceAll]) + '"/></xsl:stylesheet>', TEncoding.UTF8);
+        FEngine.Transform(Fixture('base.xml'), StylesheetFile, ResultFile);
+        Document := FEngine.LoadDocument(ResultFile);
+        Require(Document.documentElement.text = 'local-include-content', 'Der absolute lokale Include lieferte falschen Inhalt.');
+      end);
+    RunCase('native-http-unparsed-text-rejected-and-reusable',
+      procedure
+      begin
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.EvaluateBoolean(Fixture('base.xml'), 'unparsed-text("http://127.0.0.1:9/forbidden.txt") = "forbidden"', nil);
+          end, ['http', 'prohibited']);
+      end);
+    SchemaFile := TPath.Combine(DirectoryName, 'remote-import.xsd');
+    TFile.WriteAllText(SchemaFile, '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">' +
+      '<xs:import namespace="urn:forbidden" schemaLocation="http://127.0.0.1:9/forbidden.xsd"/></xs:schema>', TEncoding.UTF8);
+    RunCase('remote-schema-import-rejected',
+      procedure
+      var
+        Diagnostic, SecurityDiagnostic: string;
+      begin
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.ValidateSchemas(Fixture('base.xml'), [SchemaFile], Diagnostic);
+          end, ['Schema', 'lokalen relativen Import', 'http://127.0.0.1:9/forbidden.xsd']);
+        SecurityDiagnostic := FDiagnostic;
+        CheckSchema(Fixture('local.xml'), [Fixture('local.xsd')], True);
+        FDiagnostic := SecurityDiagnostic;
+      end);
+    RunCase('schema-multiple-original-byte-errors-are-distinct',
+      procedure
+      var
+        Document: IXMLDOMDocument3;
+        Content: TBytes;
+        Diagnostics: TArray<string>;
+        MultipleSchemaFile: string;
+      begin
+        MultipleSchemaFile := TPath.Combine(DirectoryName, 'multiple-errors.xsd');
+        TFile.WriteAllText(MultipleSchemaFile, '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">' +
+          '<xs:element name="root"><xs:complexType><xs:sequence><xs:element name="value" type="xs:integer" maxOccurs="unbounded"/>' +
+          '</xs:sequence></xs:complexType></xs:element></xs:schema>', TEncoding.UTF8);
+        Content := TEncoding.UTF8.GetBytes('<root>' + #13#10 + '<value>bad</value>' + #13#10 + '<value>wrong</value>' + #13#10 + '</root>');
+        Document := FEngine.LoadDocumentBytes(Content, 'urn:mggm:kosit:test:multiple-schema-errors');
+        Require(not FEngine.ValidateDocumentSchemaDiagnostics(Document, [MultipleSchemaFile], Diagnostics, Content), 'Mehrfach ungültige Eingabe wurde akzeptiert.');
+        Require(Length(Diagnostics) = 2, 'Zwei unabhängige Schemafehler müssen zwei Diagnosen liefern: ' + string.Join(' / ', Diagnostics));
+        Require(ContainsText(Diagnostics[0], 'bad') and ContainsText(Diagnostics[0], 'Zeile: 2;') and
+          ContainsText(Diagnostics[1], 'wrong') and ContainsText(Diagnostics[1], 'Zeile: 3;'), 'Fehlerinhalt, Reihenfolge oder Originalposition ging verloren.');
+        FDiagnostic := string.Join(' / ', Diagnostics);
+        Content := TEncoding.UTF8.GetBytes('<root><value>1</value><value>2</value></root>');
+        Document := FEngine.LoadDocumentBytes(Content, 'urn:mggm:kosit:test:multiple-schema-errors-recovered');
+        Require(FEngine.ValidateDocumentSchemaDiagnostics(Document, [MultipleSchemaFile], Diagnostics, Content), 'Gültige Eingabe nach mehreren Schemafehlern abgelehnt.');
+        Require(Length(Diagnostics) = 0, 'Die gültige Eingabe enthält veraltete Schemafehler.');
+      end);
+    CheckStylesheet('missing-relative-resource-diagnostic', '<xsl:include href="missing-relative.xsl"/>', ['missing-relative.xsl']);
+    CheckStylesheet('native-security-evil1-result-document', '<xsl:template match="/"><xsl:result-document href="ref.xml"><evil-content/>' +
+      '</xsl:result-document></xsl:template>', ['result-document']);
+    CheckStylesheet('native-security-evil2-http-document', '<xsl:template match="/"><evil-content><xsl:value-of select="document(''http://127.0.0.1:9/evil.xml'')"/>' +
+      '</evil-content></xsl:template>', ['http', 'prohibited']);
+    CheckStylesheet('native-security-evil3-relative-include', '<xsl:include href="www.evil.de/xsl.xsl"/>', ['www.evil.de', 'xsl.xsl']);
+    TFile.WriteAllText(TPath.Combine(OutsideDirectory, 'outside.xsl'), Header + '<xsl:template match="/"><evil-content/></xsl:template></xsl:stylesheet>', TEncoding.UTF8);
+    CheckStylesheet('native-security-evil4-outside-file-include', '<xsl:include href="file:///' +
+      StringReplace(TPath.Combine(OutsideDirectory, 'outside.xsl'), '\', '/', [rfReplaceAll]) + '"/>', ['außerhalb', 'outside.xsl']);
+    TFile.WriteAllText(TPath.Combine(DirectoryName, 'nested-escape.xsl'), Header +
+      '<xsl:include xml:base="../' + ExtractFileName(OutsideDirectory) + '/" href="outside.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+    CheckStylesheet('transitive-stylesheet-include-with-outside-xml-base', '<xsl:include href="nested-escape.xsl"/>', ['außerhalb', 'outside.xsl']);
+    CheckStylesheet('native-security-evil5-relative-unparsed-text', '<xsl:template match="/"><evil-content>' +
+      '<xsl:value-of select="unparsed-text(''src/test/resources/evil/ref.txt'')"/></evil-content></xsl:template>', ['ref.txt']);
+  finally
+    FEngine.ConfigureResourceRoots([FValidationRoot, FFixtures]);
+  end;
+end;
+
+// Die Speicher-API verwendet denselben lokalen Importgraphen; der Compilecache darf keine erneute Dateiprüfung pro Dokument benötigen.
+procedure TEngineTestSuite.CheckByteStylesheetContracts;
+const
+  Header = '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">';
+var
+  DirectoryName, AllowedDirectory, OutsideDirectory, AllowedStylesheet, DirectEscapeStylesheet, TransitiveEscapeStylesheet, RepairStylesheet: string;
+  Content: TBytes;
+
+begin
+  DirectoryName := TPath.Combine(ExtractFileDir(FEvidenceFile), 'byte-stylesheets-' + TPath.GetRandomFileName);
+  AllowedDirectory := TPath.Combine(ExtractFileDir(FEvidenceFile), 'byte-allowed-' + TPath.GetRandomFileName);
+  OutsideDirectory := TPath.Combine(ExtractFileDir(FEvidenceFile), 'byte-outside-' + TPath.GetRandomFileName);
+  ForceDirectories(TPath.Combine(DirectoryName, 'parts'));
+  ForceDirectories(AllowedDirectory);
+  ForceDirectories(OutsideDirectory);
+  Content := TEncoding.UTF8.GetBytes('<source/>');
+  TFile.WriteAllText(TPath.Combine(AllowedDirectory, 'local include ä.xsl'), Header +
+    '<xsl:output method="text"/><xsl:template match="/">allowed-content</xsl:template></xsl:stylesheet>', TEncoding.UTF8);
+  TFile.WriteAllText(TPath.Combine(OutsideDirectory, 'outside include ä.xsl'), Header +
+    '<xsl:output method="text"/><xsl:template match="/">outside-content</xsl:template></xsl:stylesheet>', TEncoding.UTF8);
+  TFile.WriteAllText(TPath.Combine(DirectoryName, 'parts\allowed.xsl'), Header +
+    '<xsl:include xml:base="../../' + ExtractFileName(AllowedDirectory) + '/" href="local%20include%20%C3%A4.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+  TFile.WriteAllText(TPath.Combine(DirectoryName, 'parts\outside.xsl'), Header +
+    '<xsl:include xml:base="../../' + ExtractFileName(OutsideDirectory) + '/" href="outside%20include%20%C3%A4.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+  AllowedStylesheet := TPath.Combine(DirectoryName, 'allowed-main.xsl');
+  DirectEscapeStylesheet := TPath.Combine(DirectoryName, 'direct-escape.xsl');
+  TransitiveEscapeStylesheet := TPath.Combine(DirectoryName, 'transitive-escape.xsl');
+  RepairStylesheet := TPath.Combine(DirectoryName, 'repair.xsl');
+  TFile.WriteAllText(AllowedStylesheet, Header + '<xsl:include href="parts/allowed.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+  TFile.WriteAllText(DirectEscapeStylesheet, Header + '<xsl:include href="../' + ExtractFileName(OutsideDirectory) +
+    '/outside%20include%20%C3%A4.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+  TFile.WriteAllText(TransitiveEscapeStylesheet, Header + '<xsl:include href="parts/outside.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+  FEngine.ConfigureResourceRoots([FValidationRoot, FFixtures, DirectoryName, AllowedDirectory]);
+  try
+    RunCase('bytes-local-transitive-include-with-xml-base-and-encoding',
+      procedure
+      begin
+        Require(TEncoding.UTF8.GetString(FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', AllowedStylesheet)) = 'allowed-content',
+          'Der erlaubte Byte-Include lieferte falschen Inhalt.');
+      end);
+    RunCase('bytes-direct-stylesheet-root-escape-rejected',
+      procedure
+      begin
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', DirectEscapeStylesheet);
+          end, ['außerhalb', 'outside include ä.xsl']);
+      end);
+    RunCase('bytes-transitive-stylesheet-root-escape-with-xml-base-and-encoding-rejected',
+      procedure
+      begin
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', TransitiveEscapeStylesheet);
+          end, ['außerhalb', 'outside include ä.xsl']);
+      end);
+    RunCase('bytes-stylesheet-cache-avoids-repeated-preflight-and-compilation',
+      procedure
+      var
+        CompilationCount, Cycle: Integer;
+        DomMs: Double;
+      begin
+        CompilationCount := FEngine.Statistics.StylesheetCompilationCount;
+        DomMs := FEngine.Statistics.DomMs;
+        for Cycle := 1 to 16 do
+          Require(TEncoding.UTF8.GetString(FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', AllowedStylesheet)) = 'allowed-content',
+            'Wiederholter Byte-Include liefert falschen Inhalt.');
+        Require(FEngine.Statistics.StylesheetCompilationCount = CompilationCount, 'Das unveränderte Byte-Stylesheet wurde erneut kompiliert.');
+        Require(FEngine.Statistics.DomMs = DomMs, 'Der unveränderte Stylesheetgraph wurde erneut als DOM eingelesen.');
+      end);
+    RunCase('bytes-stylesheet-cache-resource-revocation-and-recovery',
+      procedure
+      begin
+        FEngine.ConfigureResourceRoots([FValidationRoot, FFixtures, DirectoryName]);
+        try
+          RequireEngineFailure(
+            procedure
+            begin
+              FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', AllowedStylesheet);
+            end, ['außerhalb', 'local include ä.xsl']);
+        finally
+          FEngine.ConfigureResourceRoots([FValidationRoot, FFixtures, DirectoryName, AllowedDirectory]);
+        end;
+        Require(TEncoding.UTF8.GetString(FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', AllowedStylesheet)) = 'allowed-content',
+          'Die Byte-Transformation erholt sich nach erneuter Ressourcenfreigabe nicht.');
+      end);
+    RunCase('bytes-stylesheet-preflight-follows-native-cache-invalidation',
+      procedure
+      var
+        CompilationCount: Integer;
+        DomMs: Double;
+      begin
+        CompilationCount := FEngine.Statistics.StylesheetCompilationCount;
+        DomMs := FEngine.Statistics.DomMs;
+        FEngine.RegisterMemoryResource('urn:mggm:kosit:test:byte-cache-invalidation', TEncoding.UTF8.GetBytes(Header + '</xsl:stylesheet>'));
+        Require(TEncoding.UTF8.GetString(FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', AllowedStylesheet)) = 'allowed-content',
+          'Die Byte-Transformation liefert nach Cacheinvalidierung falschen Inhalt.');
+        Require(FEngine.Statistics.StylesheetCompilationCount = CompilationCount + 1, 'Das Native-Stylesheet wurde nach Cacheinvalidierung nicht neu kompiliert.');
+        Require(FEngine.Statistics.DomMs > DomMs, 'Die Sicherheitsprüfung wurde nach Native-Cacheinvalidierung nicht erneuert.');
+      end);
+    RunCase('bytes-failed-stylesheet-does-not-cache-resource-trust',
+      procedure
+      begin
+        TFile.WriteAllText(RepairStylesheet, Header + '<xsl:include href="parts/allowed.xsl"/>' +
+          '<xsl:template match="/"><xsl:value-of select="//*["/></xsl:template></xsl:stylesheet>', TEncoding.UTF8);
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', RepairStylesheet);
+          end, ['Stylesheet']);
+        TFile.WriteAllText(RepairStylesheet, Header + '<xsl:include href="parts/outside.xsl"/></xsl:stylesheet>', TEncoding.UTF8);
+        RequireEngineFailure(
+          procedure
+          begin
+            FEngine.TransformBytes(Content, 'urn:mggm:kosit:test:byte-security', RepairStylesheet);
+          end, ['außerhalb', 'outside include ä.xsl']);
+      end);
+  finally
+    FEngine.ConfigureResourceRoots([FValidationRoot, FFixtures]);
+  end;
+end;
+
 // Die kleine Integrationsmatrix prüft Sicherheitsgrenzen und die Original-UBL-Schemata.
 procedure TEngineTestSuite.ExecuteCases;
 var
@@ -554,6 +850,30 @@ begin
     begin
       CheckSchema(Fixture('local-invalid.xml'), TArray<string>.Create(Fixture('local.xsd')), False);
     end);
+  RunCase('schema-error-location-follows-original-byte-lines',
+    procedure
+    var
+      Content: TBytes;
+      Document: IXMLDOMDocument3;
+      FirstDiagnostic, ShiftedDiagnostic: string;
+      FirstPosition, ShiftedPosition: TMatch;
+    begin
+      Content := TEncoding.UTF8.GetBytes('<code xmlns="urn:mggm:kosit:test:local">nicht erlaubt</code>');
+      Document := FEngine.LoadDocumentBytes(Content, 'urn:mggm:kosit:test:original-position');
+      Require(not FEngine.ValidateDocumentSchemas(Document, [Fixture('local.xsd')], FirstDiagnostic, Content), 'Ungültige Originalbytes wurden akzeptiert.');
+      Content := TEncoding.UTF8.GetBytes(#13#10#13#10#13#10 + '<code xmlns="urn:mggm:kosit:test:local">nicht erlaubt</code>');
+      Document := FEngine.LoadDocumentBytes(Content, 'urn:mggm:kosit:test:shifted-position');
+      Require(not FEngine.ValidateDocumentSchemas(Document, [Fixture('local.xsd')], ShiftedDiagnostic, Content), 'Ungültige verschobene Originalbytes wurden akzeptiert.');
+      FirstPosition := TRegEx.Match(FirstDiagnostic, 'Zeile: ([0-9]+); Position: ([0-9]+)');
+      ShiftedPosition := TRegEx.Match(ShiftedDiagnostic, 'Zeile: ([0-9]+); Position: ([0-9]+)');
+      Require(FirstPosition.Success and ShiftedPosition.Success, 'Die Schema-Diagnose enthält keine Parserposition.');
+      Require((FirstPosition.Groups[1].Value = '1') and (ShiftedPosition.Groups[1].Value = '4'),
+        'Die gemeldete Zeile folgt nicht den Originalbytes: ' + FirstDiagnostic + ' / ' + ShiftedDiagnostic);
+      Require((StrToInt(FirstPosition.Groups[2].Value) > 0) and (FirstPosition.Groups[2].Value = ShiftedPosition.Groups[2].Value),
+        'Die Parserposition ist nicht positiv oder ändert sich durch vorangestellte Leerzeilen.');
+      CheckSchema(Fixture('local.xml'), [Fixture('local.xsd')], True);
+      FDiagnostic := FirstDiagnostic + ' / ' + ShiftedDiagnostic;
+    end);
   RunCase('missing-schema-import-is-infrastructure-error',
     procedure
     var
@@ -571,6 +891,8 @@ begin
         end;
       end;
       Require(MissingImportRaised, 'Der fehlende Schema-Import wurde nicht als Infrastrukturfehler ausgelöst.');
+      Require(ContainsText(MissingImportDiagnostic, 'absent.xsd') and ContainsText(MissingImportDiagnostic, 'fehlt'),
+        'Die Diagnose benennt den fehlenden Import nicht: ' + MissingImportDiagnostic);
       FDiagnostic := MissingImportDiagnostic;
       CheckSchema(Fixture('local.xml'), TArray<string>.Create(Fixture('local.xsd')), True);
       FDiagnostic := MissingImportDiagnostic;
@@ -607,6 +929,8 @@ begin
     FEngine.ConfigureResourceRoots(TArray<string>.Create(FValidationRoot, FFixtures));
     FEvidence.AddPair('engine_version', FEngine.Version);
     ExecuteCases;
+    CheckResolverContracts;
+    CheckByteStylesheetContracts;
     CheckLongPaths;
     CheckSchemaRedefinition;
     CheckSchemaReuse;

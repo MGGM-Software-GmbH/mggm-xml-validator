@@ -27,6 +27,14 @@ Die Zusammenstellung [validator-configuration-zugferd](https://github.com/Landri
 
 Für ZUGFeRD beruht die Anwendung auf der veröffentlichten Spezifikation; die Wiedergabe des zugrunde liegenden Standards erfolgt mit Erlaubnis von CEN und DIN gemäß den verlinkten FeRD-Nutzungsrechten. Das ist keine Übertragung von Markenrechten oder eine Zertifizierung dieses Validators.
 
+## Testrechnungen und Referenzfälle
+
+Die beiden unveränderten XRechnung-Beispiele unter `Tests/Fixtures/reference` stammen aus der [KoSIT-XRechnung-Testsuite](https://github.com/itplr-kosit/xrechnung-testsuite/tree/04cb0e80c14aaa4fb40c1118846570756dc534cd), Commit `04cb0e80c14aaa4fb40c1118846570756dc534cd`. Für diese Dateien und vier daraus abgeleitete Rechnungen gilt die mitgeführte [Apache-2.0-Lizenz](Tests/Fixtures/reference/XRechnung-Testsuite-LICENSE). Originalpfade, Originalhashes, Änderungen und Lizenzhashes stehen im [Fixture-Manifest](Tests/Fixtures/reference/fixture-manifest.json).
+
+Die vier abgeleiteten Rechnungen kennzeichnen ihre Änderungen im XML. Die ZUGFeRD-/Factur-X-Fälle sind Ableitungen des CII-Beispiels für das angegebene EN16931-/Comfort-Szenario, keine offiziellen FeRD-Beispiele. Vier zusätzliche synthetische Parser- und Szenariofälle unterliegen der Projektlizenz. Die [Fixture-Dokumentation](Tests/Fixtures/reference/README.md) beschreibt die Herkunft und den jeweiligen Zweck. Private Rechnungsdaten werden für diesen Korpus nicht verwendet.
+
+Die im Referenzlauf benötigten Regeln und das Java-JAR werden lokal bereitgestellt. Die Versions- und Hashbindung ersetzt ihre jeweiligen Lizenzbedingungen nicht; beide sind kein Bestandteil des versionierten Fixture-Verzeichnisses.
+
 ## Betriebssystem und Compiler
 
 MSXML und die benötigte Visual-C++-Laufzeit sind Voraussetzungen der Windows-Installation. Sie werden nicht aus dem Entwicklungsrechner in das Paket kopiert. Delphi ist ein Entwicklungswerkzeug und wird nicht mitgeliefert.

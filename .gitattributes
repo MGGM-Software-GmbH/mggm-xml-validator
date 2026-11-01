@@ -4,3 +4,9 @@ Source/createReportInput.xsd -text
 Source/svrl-kosit.xsd -text
 Source/xml.xsd -text
 Source/identity.xsl -text
+
+# Referenzhashes beziehen sich auf Originalbytes, einschließlich Lizenz- und Manifestdateien.
+# Vorhandener Endleerraum der Original-XMLs gehört zu den geprüften Eingabebytes.
+Tests/Fixtures/reference/*.xml -text whitespace=-blank-at-eol
+Tests/Fixtures/reference/*.json -text
+Tests/Fixtures/reference/XRechnung-Testsuite-LICENSE -text

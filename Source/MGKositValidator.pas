@@ -25,6 +25,7 @@ type
     function GetScenarioCount: Integer;
     function GetStatistics: TMGKositStatistics;
     function ValidateInternal(const XmlBytes: TBytes; const SourceUri, Reference: string): TMGKositValidationResult;
+    procedure ValidateScenarioExpression(const Scenario: IXMLDOMNode; const ElementName: string);
     procedure RegisterFrameworkResources;
   public
     constructor Create(const SaxonLibraryFile: string = '');
@@ -599,6 +600,23 @@ begin
   Result.TemporaryCleanupMs := 0;
 end;
 
+// Die statisch unerreichbare Verzweigung prüft XPathsyntax und Namespacebindungen ohne die konfigurierte Abfrage auszuführen.
+procedure TMGKositValidator.ValidateScenarioExpression(const Scenario: IXMLDOMNode; const ElementName: string);
+var
+  ExpressionNode: IXMLDOMNode;
+begin
+  ExpressionNode := Scenario.selectSingleNode('s:' + ElementName);
+  if ExpressionNode = nil then
+    Exit;
+  try
+    FEngine.EvaluateBooleanBytes(TEncoding.UTF8.GetBytes('<configuration-check/>'), FrameworkUri + 'configuration-check.xml',
+      'if (false()) then boolean((' + ExpressionNode.text + ')) else false()', ScenarioNamespaces(Scenario));
+  except
+    on Error: Exception do
+      raise EArgumentException.Create('Ungültiger ' + ElementName + '-Ausdruck in Szenario "' + NodeText(Scenario, 's:name') + '": ' + Error.Message);
+  end;
+end;
+
 // Original-XSD validiert die Konfiguration, bevor sie in die aktive Liste gelangt.
 procedure TMGKositValidator.AddScenario(const ScenarioFile, RepositoryDirectory: string);
 var
@@ -629,6 +647,8 @@ begin
       Resources := Nodes.item[Index].selectNodes('s:validateWithXmlSchema/s:resource | s:validateWithSchematron/s:resource | s:createReport/s:resource');
       for ResourceIndex := 0 to Resources.length - 1 do
         ResourceFile(RepositoryPath, Resources.item[ResourceIndex]);
+      ValidateScenarioExpression(Nodes.item[Index], 'match');
+      ValidateScenarioExpression(Nodes.item[Index], 'acceptMatch');
       Definition := TMGKositScenarioDefinition.Create;
       Definition.Document := Document;
       Definition.Node := Nodes.item[Index];
@@ -725,7 +745,7 @@ var
   Root, EngineNode, Identification, HashNode, Wellformedness, SchemaResult, SchematronResult, ResultsNode, ErrorNode, HtmlNode, SvrlNode: IXMLDOMNode;
   Resources, Assertions: IXMLDOMNodeList;
   Definition, Selected: TMGKositScenarioDefinition;
-  NamespaceBindings, SchemaFiles: TArray<string>;
+  NamespaceBindings, SchemaFiles, SchemaDiagnostics: TArray<string>;
   Index, AssertionIndex, MatchCount, FailedAssertions: Integer;
   Diagnostic, ParseError, ReportStylesheet, InputDocumentUri: string;
   InputDocumentBytes, SchematronBytes, ReportInputBytes, ReportBytes: TBytes;
@@ -741,7 +761,7 @@ begin
     ReportInput := FEngine.NewDocument;
     SetNamespaces(ReportInput);
     Root := AppendInput(ReportInput, ReportInput, 'createReportInput');
-    (Root as IXMLDOMElement).setAttribute('frameworkVersion', '1.0.0');
+    (Root as IXMLDOMElement).setAttribute('frameworkVersion', '1.0.2');
     EngineNode := AppendInput(ReportInput, Root, 'engine');
     AppendInput(ReportInput, EngineNode, 'name', 'MGGM XML Validator für Delphi ' + FEngine.Version);
     AppendInput(ReportInput, Root, 'timestamp', DateToISO8601(Now, False));
@@ -808,11 +828,14 @@ begin
         AppendImported(ReportInput, SchemaResult, Resources.item[Index]);
         SchemaFiles[Index] := ResourceFile(Selected.RepositoryDirectory, Resources.item[Index]);
       end;
-      Result.SchemaValid := FEngine.ValidateDocumentSchemas(InputDocument, SchemaFiles, Diagnostic);
+      Result.SchemaValid := FEngine.ValidateDocumentSchemaDiagnostics(InputDocument, SchemaFiles, SchemaDiagnostics, XmlBytes);
       if not Result.SchemaValid then
       begin
-        AppendSyntaxError(ReportInput, SchemaResult, Diagnostic, 'SEVERITY_ERROR');
-        AddFinding(Result, 'error', 'XML-SCHEMA', Diagnostic, '', 'schema');
+        for Diagnostic in SchemaDiagnostics do
+        begin
+          AppendSyntaxError(ReportInput, SchemaResult, Diagnostic, 'SEVERITY_ERROR');
+          AddFinding(Result, 'error', 'XML-SCHEMA', Diagnostic, '', 'schema');
+        end;
       end
       else
       begin
@@ -916,7 +939,15 @@ begin
       Result.Acceptance := kaUndefined;
       Result.ErrorMessage := ExceptionObject.Message;
       if ReportInput <> nil then
+      begin
+        // Auch ein vor Schematron auftretender Ressourcenfehler gehört in die vorhandene Berichtseingabe.
+        if (Root <> nil) and (Root.selectSingleNode('in:processingError') = nil) then
+        begin
+          ErrorNode := AppendInput(ReportInput, Root, 'processingError');
+          AppendInput(ReportInput, ErrorNode, 'error', Result.ErrorMessage);
+        end;
         Result.ReportInputXml := ReportInput.xml;
+      end;
     end;
   end;
 end;

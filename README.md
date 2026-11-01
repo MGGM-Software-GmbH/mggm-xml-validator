@@ -182,9 +182,9 @@ python -c "import base64,pathlib; print(base64.b64encode(pathlib.Path('Source/sc
 
 Die Delphi-Testprogramme unter `Tests` prüfen Engine, Pipeline, CLI, Streams, Wiederverwendung und das Beispiel. Sie schreiben ihre EXEs unter `Tests/build`. Argumente und Ergebnisse stehen in [docs/TESTING.md](docs/TESTING.md).
 
-Das [PRP zur gezielten Testerweiterung](docs/prp/test-coverage/PRP.md) beschreibt den geplanten Abgleich mit den Originaltests, zusätzliche fachlich begründete Fälle und Java-/Delphi-Vergleiche. Die dort geplanten Tests sind vom vorhandenen Prüfnachweis zu unterscheiden.
+Die [Methodenmatrix](docs/prp/test-coverage/METHODENMATRIX.md) ordnet die Originaltests des festgelegten KoSIT-Stands den öffentlichen Delphi-Verträgen oder begründeten Ausschlüssen zu. Der lokale Referenzkorpus enthält zehn versionierte Fälle mit Fixture-, Lizenz-, JAR- und Regelhashes. [TESTING.md](docs/TESTING.md) beschreibt die Ausführung; [RESULTATE.md](docs/prp/test-coverage/RESULTATE.md) hält Laufnachweise und verbleibende Unterschiede fest. Java wird nur für diesen Entwicklungsvergleich benötigt.
 
-MSXML-Diagnosen können sich von den Java-Diagnosen unterscheiden; insbesondere wird die erste MSXML-Schemadiagnose übernommen. Unbekannte Regeln und ungültige Laufzeitvoraussetzungen bleiben Fehler. Regelpakete müssen vertrauenswürdig sein. Das Projekt verspricht keine vollständige XPath-/XSLT-Sprachkonformitätsprüfung oder Dateisystem-Sandbox.
+MSXML-Diagnosen können sich von den Java-Diagnosen unterscheiden. Schemafehler werden mit Zeile und Spalte aus den Originalbytes ermittelt; mehrere von MSXML gemeldete Fehler bleiben erhalten. Der Referenzvergleich erlaubt nur ausdrücklich beschriebene Unterschiede bestimmter Diagnoseklassen. Abweichende Befundmengen werden sichtbar ausgewiesen. Unbekannte Regeln und ungültige Laufzeitvoraussetzungen bleiben Fehler. Regelpakete müssen vertrauenswürdig sein. Das Projekt verspricht keine vollständige XPath-/XSLT-Sprachkonformitätsprüfung oder Dateisystem-Sandbox.
 
 ## Lizenz und Herkunft
 
