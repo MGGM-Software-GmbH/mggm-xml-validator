@@ -1,0 +1,520 @@
+{
+  "checked_at_utc": "2026-11-03T10:59:27.308818+00:00",
+  "scope": "SVRL-Berichtprojektion im jeweiligen Elternkontext; keine Änderung der Frameworkressourcen, Regeln oder Szenarioauswahl.",
+  "baseline_commit": "817d8618c00e4d692d2a7da8317b41847657c795",
+  "source_sha256": {
+    "Source/MGKositValidator.pas": "94f10f95aff022fedeeb2212903f99de6788c04e2283bea3ba91a931559dc85f",
+    "Tests/PipelineTests.dpr": "6b4c0f8dd462fe5e560134de681e6745e761ec9ec57b90cf64b09c05209be149"
+  },
+  "configuration": {
+    "relative_location": "../Validation/validator-configuration-xrechnung/3.0.2/scenarios.xml",
+    "date": "2026-09-02",
+    "xrechnung_schematron": "2.6.0",
+    "en16931": "1.3.16",
+    "scenarios_sha256": "3e8161a39dfaa6aea4d990b279aab848be4f4c6169e820f354a159bda7693fb0",
+    "en16931_ubl_sha256": "759f2d2e830c7fd1d5a6e8b4f61e5dbafc7a7805862c4ae1c749eeac6adde698",
+    "xrechnung_ubl_sha256": "e32d831668facbbd5136cc0119bf1dd6f92ac20738aa3b3f021586f5a305c738"
+  },
+  "reproduction": {
+    "input": "Tests/Fixtures/reference/xr-ubl-valid.xml",
+    "result": "F / UNDEFINED; Nicht im KoSIT-Modell definiertes SVRL-Element: metadata",
+    "delphi_runs": [
+      {
+        "version": "delphi-11",
+        "run_id": "35DE0305-9614-4438-827C-66DD3221611D",
+        "exit_code": 1
+      },
+      {
+        "version": "delphi-13",
+        "run_id": "9E253211-9F3A-4908-912C-6E177CF92DA6",
+        "exit_code": 1
+      }
+    ],
+    "regression_countercheck": {
+      "delphi": "11",
+      "total": 37,
+      "passed": 34,
+      "failed_cases": [
+        "svrl-metadata-copy-and-custom-level",
+        "svrl-unknown-wrapper-no-hoisting",
+        "svrl-known-element-wrong-parent"
+      ],
+      "run_id": "1723BDB7-4EFA-445F-AF11-268D3DD5B51D"
+    }
+  },
+  "java_reference": {
+    "version": "1.6.3",
+    "java_runtime": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "jar_sha256": "799e64befca97d4080e03608c80b85dd5a5ecc5f4ae4f35d1116ec2855b9a7c9",
+    "exit_code": 1,
+    "started_at": "2026-11-03T11:53:10+01:00",
+    "results": {
+      "xr-ubl-valid.xml": {
+        "accepted": true,
+        "findings": {
+          "BR-DE-TMP-32": "information"
+        }
+      },
+      "xr-ubl-business-error.xml": {
+        "accepted": false,
+        "findings": {
+          "BR-CL-01": "error",
+          "BR-DE-17": "warning",
+          "BR-DE-TMP-32": "information"
+        }
+      }
+    }
+  },
+  "cli_builds": [
+    {
+      "delphi": "11",
+      "build_id": "{54BD91B5-09C2-4562-BC50-D53378AD6A04}",
+      "sha256": "12ad82555ba56d496fc31a9db1d082e00589488d0c4d6c1607157fa35ace1f23",
+      "exit_code": 0,
+      "warnings": [
+        {
+          "file": "Source\\MGKositEngine.pas",
+          "line": 131,
+          "code": "W1002",
+          "message": "Symbol 'GetFinalPathNameByHandle' is specific to a platform",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "delphi": "13",
+      "build_id": "{A779D107-3677-4E16-BEF5-D073EBA4428A}",
+      "sha256": "d16c8ccfb19fdb615abdc413dd4acb21ba83363c442731388c90515819331228",
+      "exit_code": 0,
+      "warnings": [
+        {
+          "file": "Source\\MGKositEngine.pas",
+          "line": 131,
+          "code": "W1002",
+          "message": "Symbol 'GetFinalPathNameByHandle' is specific to a platform",
+          "severity": "warning"
+        }
+      ]
+    }
+  ],
+  "cli_runs": [
+    {
+      "delphi": "11",
+      "run_id": "D211230F-402F-4F6B-AB80-FA4E41E78313",
+      "exit_code": 1
+    },
+    {
+      "delphi": "13",
+      "run_id": "42DF7CE4-F1D0-43AA-B27C-064358CD39A9",
+      "exit_code": 1
+    }
+  ],
+  "suite_builds": [
+    {
+      "delphi": "delphi-11",
+      "project": "MGGMXmlValidatorBatch.dproj",
+      "build_id": "{A1EF2FCF-C677-4DF2-A002-E4A98DDAEDF2}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Examples\\ValidateXmlExample.dproj",
+      "build_id": "{0C8A6D2C-E933-461E-AA89-A3D39E30AD31}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\EngineTests.dproj",
+      "build_id": "{B1BE3F5A-62B9-43E3-8B18-C9FF4D665867}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\CliTests.dproj",
+      "build_id": "{1F3AF0EF-4237-4097-A906-A6BDDC84D7F1}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\StreamAdapterTests.dproj",
+      "build_id": "{643F02E3-4EFE-4DBD-9384-39B0AEB845B9}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\NativeReuseTests.dproj",
+      "build_id": "{2A6FA665-C2E7-4998-80B6-61B34C226E4D}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\MemoryTransferTests.dproj",
+      "build_id": "{84A30305-47FB-418C-A4EA-3A85813DE9EB}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\ParallelEngineTests.dproj",
+      "build_id": "{DDB85946-0C9F-40D6-B2D1-3B1945D93EFF}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-11",
+      "project": "Tests\\DelphiExampleTests.dproj",
+      "build_id": "{0C3C557F-72BF-428C-9C48-9CA151D8DB7B}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "MGGMXmlValidatorBatch.dproj",
+      "build_id": "{9DE991AD-36F9-4E8B-BD43-568CEEF372C2}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Examples\\ValidateXmlExample.dproj",
+      "build_id": "{BC60E0CB-4658-4B09-854A-F6E0AFB7CB2B}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\EngineTests.dproj",
+      "build_id": "{0F41C7BA-8A68-4D46-90C6-AE5AE6D7D174}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\CliTests.dproj",
+      "build_id": "{4F493C94-5C0F-49A0-AD74-9300798F1B5E}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\StreamAdapterTests.dproj",
+      "build_id": "{E89301AD-20A1-43CB-91D6-F4919FDB8609}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\NativeReuseTests.dproj",
+      "build_id": "{0602456D-6E6B-4A30-84C8-B030E81670BD}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\MemoryTransferTests.dproj",
+      "build_id": "{63223F88-0ACA-45BA-A6AD-223C252F1313}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\ParallelEngineTests.dproj",
+      "build_id": "{8B307F5A-ECD7-4BB4-9923-BEF779C9F0FF}",
+      "success": true
+    },
+    {
+      "delphi": "delphi-13",
+      "project": "Tests\\DelphiExampleTests.dproj",
+      "build_id": "{005FDDC2-D3B4-4B35-B1B8-07443A50ECD7}",
+      "success": true
+    }
+  ],
+  "suite_runs": [
+    {
+      "delphi": "delphi-11",
+      "suite": "Engine",
+      "build_id": "{B1BE3F5A-62B9-43E3-8B18-C9FF4D665867}",
+      "run_id": "7084CE68-C0F9-46F8-86A6-18B66167BD1A",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-11",
+      "suite": "Cli",
+      "build_id": "{1F3AF0EF-4237-4097-A906-A6BDDC84D7F1}",
+      "run_id": "99DDC7FF-2AEB-4926-B390-B41F11F7C3A7",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-11",
+      "suite": "StreamAdapter",
+      "build_id": "{643F02E3-4EFE-4DBD-9384-39B0AEB845B9}",
+      "run_id": "423EE873-8036-45EF-AC34-F854CB03D303",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-11",
+      "suite": "NativeReuse",
+      "build_id": "{2A6FA665-C2E7-4998-80B6-61B34C226E4D}",
+      "run_id": "F1582918-1130-45EC-8BDD-DD1B6C6AE9DA",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-11",
+      "suite": "MemoryTransfer",
+      "build_id": "{84A30305-47FB-418C-A4EA-3A85813DE9EB}",
+      "run_id": "6EFA8C9D-7A1C-4147-B7CA-31DB474AF7BF",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-11",
+      "suite": "ParallelEngine",
+      "build_id": "{DDB85946-0C9F-40D6-B2D1-3B1945D93EFF}",
+      "run_id": "B512A9E2-DAB8-4FEE-B47C-3B4F5F5511A4",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-11",
+      "suite": "DelphiExample",
+      "build_id": "{0C3C557F-72BF-428C-9C48-9CA151D8DB7B}",
+      "run_id": "5C9D2E5F-30A5-4676-BBA6-985BA48CB036",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "Engine",
+      "build_id": "{0F41C7BA-8A68-4D46-90C6-AE5AE6D7D174}",
+      "run_id": "48AB6093-842C-4D59-A7A3-92A7CB08AE4B",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "Cli",
+      "build_id": "{4F493C94-5C0F-49A0-AD74-9300798F1B5E}",
+      "run_id": "82E69ABD-FAB2-40C4-B378-D845E96CF2FF",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "StreamAdapter",
+      "build_id": "{E89301AD-20A1-43CB-91D6-F4919FDB8609}",
+      "run_id": "A725E22E-6E7B-4C7E-8058-BFCC28EDACCB",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "NativeReuse",
+      "build_id": "{0602456D-6E6B-4A30-84C8-B030E81670BD}",
+      "run_id": "75C473D9-8657-4CE6-8B69-4E4DA4F17D9E",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "MemoryTransfer",
+      "build_id": "{63223F88-0ACA-45BA-A6AD-223C252F1313}",
+      "run_id": "083B95DC-A084-452D-8889-B57D88E9C08B",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "ParallelEngine",
+      "build_id": "{8B307F5A-ECD7-4BB4-9923-BEF779C9F0FF}",
+      "run_id": "49254880-A2C6-4BA7-9C78-8E7E919BC9FF",
+      "exit_code": 0
+    },
+    {
+      "delphi": "delphi-13",
+      "suite": "DelphiExample",
+      "build_id": "{005FDDC2-D3B4-4B35-B1B8-07443A50ECD7}",
+      "run_id": "855660A9-881A-44EA-9B90-426C4CD53F53",
+      "exit_code": 0
+    }
+  ],
+  "pipeline_runs": [
+    {
+      "delphi": "delphi-11",
+      "build_id": "{573C841A-0F91-452B-BC02-3228C43DC63A}",
+      "run_id": "D2CB93B3-92D6-4C9E-AB3B-55A23AADC5F8",
+      "exit_code": 0,
+      "sha256": "b3d74bc1d5c0b572cfae8fc39523a7f188fd3f62b25c158a2c85c31a18220de0"
+    },
+    {
+      "delphi": "delphi-13",
+      "build_id": "{77835307-1D60-4507-ADCC-74D6F48ADE9A}",
+      "run_id": "99EB625E-E1C2-49C0-8070-E9210C129E9D",
+      "exit_code": 0,
+      "sha256": "8571d7b45ee9c266b5adb7af882b7741dd8376e27d692a0f5c6bebb5d6dd18aa"
+    }
+  ],
+  "results_per_compiler": {
+    "Pipeline": {
+      "passed": 39,
+      "failed": 0
+    },
+    "Engine": {
+      "passed": 59,
+      "failed": 0
+    },
+    "CLI": {
+      "passed": 56,
+      "failed": 0
+    },
+    "StreamAdapter": {
+      "passed": 4,
+      "failed": 0
+    },
+    "NativeReuse": {
+      "passed": 22,
+      "failed": 0
+    },
+    "MemoryTransfer": {
+      "passed": 14,
+      "failed": 0
+    },
+    "DelphiExample": {
+      "passed": 17,
+      "failed": 0
+    },
+    "ParallelEngine": {
+      "passed_calls": 16,
+      "overlapping_rounds": 8,
+      "passed": true
+    }
+  },
+  "python": {
+    "command": "python3 -m unittest discover -s Tests",
+    "passed": 130,
+    "failed": 0,
+    "exit_code": 0,
+    "framework_resource_tests": 9
+  },
+  "artifacts": {
+    "protected_files": {
+      "bundled11": {
+        "files": 219,
+        "unchanged": true
+      },
+      "bundled13": {
+        "files": 219,
+        "unchanged": true
+      },
+      "updated_rules": {
+        "files": 97,
+        "unchanged": true
+      }
+    },
+    "framework": [
+      {
+        "file": "Source/scenarios.xsd",
+        "sha256": "3990b4386b8939cb3bba92b96047238c9465402eaed10f2735fb7d9275525321",
+        "declaration_unchanged": true,
+        "bytes_equal": true
+      },
+      {
+        "file": "Source/createReportInput.xsd",
+        "sha256": "73fb6e16c6f015e403f580722e83acad23c478aab0d46fd8469f9d45425ba2d9",
+        "declaration_unchanged": true,
+        "bytes_equal": true
+      },
+      {
+        "file": "Source/svrl-kosit.xsd",
+        "sha256": "4612bb8731fedaaacd50173b0966cccff0cc521e6eb4488222d7758642e146ad",
+        "declaration_unchanged": true,
+        "bytes_equal": true
+      },
+      {
+        "file": "Source/xml.xsd",
+        "sha256": "a0149f651e68f4b81399b3125a8168198b4acbedfa3268461c0ba4e6d517c400",
+        "declaration_unchanged": true,
+        "bytes_equal": true
+      },
+      {
+        "file": "Source/identity.xsl",
+        "sha256": "cacbff8cd3ad97c3164d919cfdee3664042610d7ad61f9ecebc4858a369002cc",
+        "declaration_unchanged": true,
+        "bytes_equal": true
+      }
+    ],
+    "comparisons": [
+      {
+        "delphi": "11",
+        "input": "xr-ubl-valid.xml",
+        "java_signature_equal": true,
+        "accepted": true,
+        "findings": [
+          {
+            "code": "BR-DE-TMP-32",
+            "level": "information"
+          }
+        ],
+        "report_input_xsd_valid_java_and_delphi": true,
+        "report_input_root_metadata_absent": true,
+        "html_nonempty": true
+      },
+      {
+        "delphi": "11",
+        "input": "xr-ubl-business-error.xml",
+        "java_signature_equal": true,
+        "accepted": false,
+        "findings": [
+          {
+            "code": "BR-CL-01",
+            "level": "error"
+          },
+          {
+            "code": "BR-DE-17",
+            "level": "warning"
+          },
+          {
+            "code": "BR-DE-TMP-32",
+            "level": "information"
+          }
+        ],
+        "report_input_xsd_valid_java_and_delphi": true,
+        "report_input_root_metadata_absent": true,
+        "html_nonempty": true
+      },
+      {
+        "delphi": "13",
+        "input": "xr-ubl-valid.xml",
+        "java_signature_equal": true,
+        "accepted": true,
+        "findings": [
+          {
+            "code": "BR-DE-TMP-32",
+            "level": "information"
+          }
+        ],
+        "report_input_xsd_valid_java_and_delphi": true,
+        "report_input_root_metadata_absent": true,
+        "html_nonempty": true
+      },
+      {
+        "delphi": "13",
+        "input": "xr-ubl-business-error.xml",
+        "java_signature_equal": true,
+        "accepted": false,
+        "findings": [
+          {
+            "code": "BR-CL-01",
+            "level": "error"
+          },
+          {
+            "code": "BR-DE-17",
+            "level": "warning"
+          },
+          {
+            "code": "BR-DE-TMP-32",
+            "level": "information"
+          }
+        ],
+        "report_input_xsd_valid_java_and_delphi": true,
+        "report_input_root_metadata_absent": true,
+        "html_nonempty": true
+      }
+    ]
+  },
+  "original_svrl_preservation": "Codeprüfung: importNode(..., True) erzeugt die separate Berichtskopie. SchematronBytes werden nicht verändert; direkte Findings werden weiterhin aus SchematronDocument gelesen. Die Regressionen vergleichen konkrete Rohinhalte mit der Berichtskopie und prüfen direkte Findings sowie customLevel.",
+  "upstream_reference": {
+    "tag": "v1.6.3",
+    "commit": "37cddce28e15ac3a0319db006ab21d3f1064ca8c",
+    "files": [
+      "src/main/java/de/kosit/validationtool/impl/ConversionService.java",
+      "src/main/java/de/kosit/validationtool/impl/tasks/SchematronValidationAction.java",
+      "src/main/java/de/kosit/validationtool/impl/tasks/CreateReportAction.java"
+    ]
+  },
+  "not_run": [
+    "Win32; nicht Gegenstand dieses Auftrags."
+  ],
+  "required_checks_blocked": []
+}

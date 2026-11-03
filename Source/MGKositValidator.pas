@@ -407,12 +407,49 @@ begin
   Parent.appendChild(Document.importNode(Source, True));
 end;
 
+// Modellreferenzen werden mit ihrem Namespace aufgelöst; ein fehlender Modellteil bleibt ein Verarbeitungsfehler.
+function ResolveSvrlReference(const Schema: IXMLDOMDocument3; const Context: IXMLDOMNode; const ModelKind, ReferenceName: string): IXMLDOMNode;
+var
+  Ancestor, Binding: IXMLDOMNode;
+  Prefix, LocalName, NamespaceUri, BindingName: string;
+  SeparatorPosition: Integer;
+begin
+  SeparatorPosition := Pos(':', ReferenceName);
+  if SeparatorPosition > 0 then
+  begin
+    Prefix := Copy(ReferenceName, 1, SeparatorPosition - 1);
+    LocalName := Copy(ReferenceName, SeparatorPosition + 1, MaxInt);
+    BindingName := 'xmlns:' + Prefix;
+  end
+  else
+  begin
+    LocalName := ReferenceName;
+    BindingName := 'xmlns';
+  end;
+  NamespaceUri := '';
+  Ancestor := Context;
+  while (Ancestor <> nil) and (Ancestor.nodeType = NODE_ELEMENT) do
+  begin
+    Binding := Ancestor.attributes.getNamedItem(BindingName);
+    if Binding <> nil then
+    begin
+      NamespaceUri := Binding.text;
+      Break;
+    end;
+    Ancestor := Ancestor.parentNode;
+  end;
+  if (LocalName = '') or (NamespaceUri <> SvrlNamespace) then
+    raise EInvalidOperation.Create('Nicht unterstützte SVRL-Modellreferenz: ' + ReferenceName);
+  Result := Schema.selectSingleNode('/xs:schema/xs:' + ModelKind + '[@name="' + LocalName + '"]');
+  if Result = nil then
+    raise EInvalidOperation.Create('SVRL-Modellreferenz fehlt (' + ModelKind + '): ' + ReferenceName);
+end;
+
 // JAXB bildet nur die Attribute des generierten SVRL-Modells ab; Wildcards bleiben erhalten.
 procedure CollectSvrlAttributes(const Schema: IXMLDOMDocument3; const Model: IXMLDOMNode; const Attributes: TStrings; var AllowAny: Boolean);
 var
   Child, ReferencedModel: IXMLDOMNode;
   ReferenceName, AttributeName: string;
-  SeparatorPosition: Integer;
 begin
   Child := Model.firstChild;
   while Child <> nil do
@@ -438,12 +475,7 @@ begin
       else if Child.baseName = 'attributeGroup' then
       begin
         ReferenceName := AttributeText(Child, 'ref');
-        SeparatorPosition := Pos(':', ReferenceName);
-        if SeparatorPosition > 0 then
-          Delete(ReferenceName, 1, SeparatorPosition);
-        ReferencedModel := Schema.selectSingleNode('/xs:schema/xs:attributeGroup[@name="' + ReferenceName + '"]');
-        if ReferencedModel = nil then
-          raise EInvalidOperation.Create('SVRL-Attributgruppe fehlt: ' + ReferenceName);
+        ReferencedModel := ResolveSvrlReference(Schema, Child, 'attributeGroup', ReferenceName);
         CollectSvrlAttributes(Schema, ReferencedModel, Attributes, AllowAny);
       end
       else if (Child.baseName = 'complexContent') or (Child.baseName = 'simpleContent') then
@@ -451,12 +483,7 @@ begin
       else if (Child.baseName = 'extension') or (Child.baseName = 'restriction') then
       begin
         ReferenceName := AttributeText(Child, 'base');
-        SeparatorPosition := Pos(':', ReferenceName);
-        if SeparatorPosition > 0 then
-          Delete(ReferenceName, 1, SeparatorPosition);
-        ReferencedModel := Schema.selectSingleNode('/xs:schema/xs:complexType[@name="' + ReferenceName + '"]');
-        if ReferencedModel = nil then
-          raise EInvalidOperation.Create('SVRL-Basistyp fehlt: ' + ReferenceName);
+        ReferencedModel := ResolveSvrlReference(Schema, Child, 'complexType', ReferenceName);
         CollectSvrlAttributes(Schema, ReferencedModel, Attributes, AllowAny);
         CollectSvrlAttributes(Schema, Child, Attributes, AllowAny);
       end;
@@ -465,24 +492,104 @@ begin
   end;
 end;
 
-// Der Bericht erhält die JAXB-Modellsicht; rohe Befunde werden weiterhin aus dem Saxon-Ergebnis gelesen.
-procedure ProjectSvrlModel(const Schema: IXMLDOMDocument3; const Node: IXMLDOMNode);
+// Nur Partikel des jeweiligen Elterntyps bestimmen die zulässigen Kinder, einschließlich Gruppen und Basistypen.
+procedure CollectSvrlChildren(const Schema: IXMLDOMDocument3; const Model: IXMLDOMNode;
+  const Elements: TDictionary<string, IXMLDOMNode>; const Wildcards: TList<IXMLDOMNode>);
 var
-  Model, Attribute, Child: IXMLDOMNode;
+  Child, Declaration, ReferencedModel: IXMLDOMNode;
+  ReferenceName, ElementNamespace, ElementForm: string;
+begin
+  Child := Model.firstChild;
+  while Child <> nil do
+  begin
+    if Child.nodeType = NODE_ELEMENT then
+    begin
+      if Child.baseName = 'element' then
+      begin
+        ReferenceName := AttributeText(Child, 'ref');
+        if ReferenceName <> '' then
+        begin
+          Declaration := ResolveSvrlReference(Schema, Child, 'element', ReferenceName);
+          ElementNamespace := SvrlNamespace;
+        end
+        else
+        begin
+          Declaration := Child;
+          ElementForm := AttributeText(Child, 'form');
+          if ElementForm = '' then
+            ElementForm := AttributeText(Schema.documentElement, 'elementFormDefault');
+          ElementNamespace := '';
+          if ElementForm = 'qualified' then
+            ElementNamespace := SvrlNamespace;
+        end;
+        if AttributeText(Declaration, 'name') = '' then
+          raise EInvalidOperation.Create('SVRL-Elementdeklaration ohne Namen');
+        Elements.AddOrSetValue(ElementNamespace + '|' + AttributeText(Declaration, 'name'), Declaration);
+      end
+      else if Child.baseName = 'any' then
+        Wildcards.Add(Child)
+      else if Child.baseName = 'group' then
+      begin
+        ReferencedModel := ResolveSvrlReference(Schema, Child, 'group', AttributeText(Child, 'ref'));
+        CollectSvrlChildren(Schema, ReferencedModel, Elements, Wildcards);
+      end
+      else if (Child.baseName = 'sequence') or (Child.baseName = 'choice') or (Child.baseName = 'all') or
+        (Child.baseName = 'complexContent') or (Child.baseName = 'simpleContent') then
+        CollectSvrlChildren(Schema, Child, Elements, Wildcards)
+      else if (Child.baseName = 'extension') or (Child.baseName = 'restriction') then
+      begin
+        ReferencedModel := ResolveSvrlReference(Schema, Child, 'complexType', AttributeText(Child, 'base'));
+        CollectSvrlChildren(Schema, ReferencedModel, Elements, Wildcards);
+        CollectSvrlChildren(Schema, Child, Elements, Wildcards);
+      end;
+    end;
+    Child := Child.nextSibling;
+  end;
+end;
+
+// Die Wildcards des Frameworkmodells nehmen fremde und lokale Rich-Text-Unterbäume unverändert auf.
+function MatchesSvrlWildcard(const Wildcards: TList<IXMLDOMNode>; const NamespaceUri: string): Boolean;
+var
+  Wildcard: IXMLDOMNode;
+  NamespaceConstraint, NamespaceToken: string;
+begin
+  for Wildcard in Wildcards do
+  begin
+    NamespaceConstraint := AttributeText(Wildcard, 'namespace');
+    if NamespaceConstraint = '' then
+      Exit(True);
+    for NamespaceToken in NamespaceConstraint.Split([' ', #9, #10, #13], TStringSplitOptions.ExcludeEmpty) do
+      if (NamespaceToken = '##any') or ((NamespaceToken = '##local') and (NamespaceUri = '')) or
+        ((NamespaceToken = '##targetNamespace') and (NamespaceUri = SvrlNamespace)) or
+        ((NamespaceToken = '##other') and (NamespaceUri <> '') and (NamespaceUri <> SvrlNamespace)) or (NamespaceToken = NamespaceUri) then
+        Exit(True);
+  end;
+  Result := False;
+end;
+
+// Unmodellierte Unterbäume entfallen als Einheit; ihre Nachkommen werden niemals in den Elternknoten hochgezogen.
+procedure ProjectSvrlElement(const Schema: IXMLDOMDocument3; const Node, Declaration: IXMLDOMNode);
+var
+  Model, Attribute, Child, NextChild, ChildDeclaration: IXMLDOMNode;
   Attributes: TStringList;
+  Elements: TDictionary<string, IXMLDOMNode>;
+  Wildcards: TList<IXMLDOMNode>;
   AttributeIndex: Integer;
   AllowAny: Boolean;
 begin
-  if (Node.nodeType <> NODE_ELEMENT) or (Node.namespaceURI <> SvrlNamespace) then
-    Exit;
-  Model := Schema.selectSingleNode('/xs:schema/xs:element[@name="' + Node.baseName + '"]/xs:complexType');
+  Model := Declaration.selectSingleNode('xs:complexType');
+  if (Model = nil) and (AttributeText(Declaration, 'type') <> '') then
+    Model := ResolveSvrlReference(Schema, Declaration, 'complexType', AttributeText(Declaration, 'type'));
   if Model = nil then
-    raise EInvalidOperation.Create('Nicht im KoSIT-Modell definiertes SVRL-Element: ' + Node.baseName);
+    raise EInvalidOperation.Create('SVRL-Elementtyp fehlt: ' + Node.baseName);
   Attributes := TStringList.Create;
+  Elements := TDictionary<string, IXMLDOMNode>.Create;
+  Wildcards := TList<IXMLDOMNode>.Create;
   try
     Attributes.CaseSensitive := True;
     AllowAny := False;
     CollectSvrlAttributes(Schema, Model, Attributes, AllowAny);
+    CollectSvrlChildren(Schema, Model, Elements, Wildcards);
     if not AllowAny then
       for AttributeIndex := Node.attributes.length - 1 downto 0 do
       begin
@@ -493,15 +600,38 @@ begin
         if Attributes.IndexOf(Attribute.namespaceURI + '|' + Attribute.baseName) < 0 then
           Node.attributes.removeNamedItem(Attribute.nodeName);
       end;
+    Child := Node.firstChild;
+    while Child <> nil do
+    begin
+      NextChild := Child.nextSibling;
+      if Child.nodeType = NODE_ELEMENT then
+      begin
+        if Elements.TryGetValue(Child.namespaceURI + '|' + Child.baseName, ChildDeclaration) then
+          ProjectSvrlElement(Schema, Child, ChildDeclaration)
+        // Ein Wildcard-Inhalt bleibt opak, auch wenn er seinerseits SVRL-Elemente enthält.
+        else if not MatchesSvrlWildcard(Wildcards, Child.namespaceURI) then
+          Node.removeChild(Child);
+      end;
+      Child := NextChild;
+    end;
   finally
+    FreeAndNil(Wildcards);
+    FreeAndNil(Elements);
     FreeAndNil(Attributes);
   end;
-  Child := Node.firstChild;
-  while Child <> nil do
-  begin
-    ProjectSvrlModel(Schema, Child);
-    Child := Child.nextSibling;
-  end;
+end;
+
+// Der Bericht erhält die JAXB-Modellsicht; rohe Befunde werden weiterhin aus dem Saxon-Ergebnis gelesen.
+procedure ProjectSvrlModel(const Schema: IXMLDOMDocument3; const Node: IXMLDOMNode);
+var
+  Declaration: IXMLDOMNode;
+begin
+  if (Node.nodeType <> NODE_ELEMENT) or (Node.namespaceURI <> SvrlNamespace) or (Node.baseName <> 'schematron-output') then
+    raise EInvalidOperation.Create('Schematron liefert kein svrl:schematron-output');
+  Declaration := Schema.selectSingleNode('/xs:schema/xs:element[@name="schematron-output"]');
+  if Declaration = nil then
+    raise EInvalidOperation.Create('SVRL-Wurzeldeklaration fehlt: schematron-output');
+  ProjectSvrlElement(Schema, Node, Declaration);
 end;
 
 // XSD- und Parserfehler werden in den vorgesehenen XMLSyntaxError-Elementen abgelegt.

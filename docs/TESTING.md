@@ -22,7 +22,7 @@ Die Delphi-Testprogramme werden jeweils über ihre `.dproj` in Debug gebaut und 
 | Projekt | Argumente |
 |---|---|
 | `Tests/EngineTests.dproj` | `DLL ValidationRoot EvidenceJson [OriginalUblInvoice [FixtureRoot]]` |
-| `Tests/PipelineTests.dproj` | `DLL UpstreamRoot EvidenceDirectory` |
+| `Tests/PipelineTests.dproj` | `DLL UpstreamRoot EvidenceDirectory [ValidationRoot PublicValidFile BusinessInvalidFile]` |
 | `Tests/CliTests.dproj` | `CLIExe DLL ValidationRoot ValidXml InvalidBusinessXml EvidenceDirectory` |
 | `Tests/StreamAdapterTests.dproj` | `DLL ValidationRoot ValidUbl InvalidUbl EvidenceJson` |
 | `Tests/NativeReuseTests.dproj` | `DLL EvidenceJson` |
@@ -33,6 +33,16 @@ Die Delphi-Testprogramme werden jeweils über ihre `.dproj` in Debug gebaut und 
 `UpstreamRoot` bezeichnet einen separaten Checkout oder bytegleichen Quellexport des [KoSIT-Originalvalidators v1.6.3](https://github.com/itplr-kosit/validator/tree/v1.6.3), Commit `37cddce28e15ac3a0319db006ab21d3f1064ca8c`. Für `ValidXml` und `InvalidBusinessXml` können `Tests/Fixtures/reference/xr-ubl-valid.xml` und `Tests/Fixtures/reference/xr-ubl-business-error.xml` verwendet werden. Herkunft, Lizenz und die gezielten Änderungen sind im [Fixture-Verzeichnis](../Tests/Fixtures/reference/README.md) dokumentiert.
 
 `FixtureRoot` bezeichnet das versionierte Verzeichnis `Tests/Fixtures`. Für compilerabhängige Testausgabeordner diesen Pfad beim Engine-Test ausdrücklich übergeben. Die optionale Standardauflösung liegt eine Ebene über dem normalen Testausgabeordner und sucht keine alternativen Verzeichnisse.
+
+Die Pipeline-Suite führt ohne die drei optionalen Argumente 37 Fälle aus. Darunter prüfen fünf SVRL-Fälle Metadaten zwischen bekannten Geschwistern, unbekannte Wrapper, bekannte Elemente im falschen Elternkontext, Rich-Text-Wildcards und eine falsche Wurzel. Die Berichtseingabe wird gegen das unveränderte Frameworkschema geprüft. Die Tests vergleichen konkrete Inhalte der Saxon-Ausgabe mit der Berichtskopie und prüfen direkte Findings, `customLevel` und Annahmeentscheidung. Echte XSLT-Laufzeitfehler sind durch die bestehenden Pipelinefälle abgedeckt.
+
+Für zwei zusätzliche Integrationsfälle sind alle drei optionalen Argumente erforderlich. Hier bezeichnet `ValidationRoot` ausdrücklich das separat bereitgestellte Verzeichnis mit `validator-configuration-xrechnung/3.0.2/scenarios.xml`. Für den [SVRL-Prüfnachweis](../Tests/svrl-metadata-verification.json) wurden die aktualisierten Regeln vom 02.09.2026 mit XRechnung-Schematron 2.6.0 und EN16931 1.3.16 verwendet. Die älteren Regeln im Laufzeitpaket werden dafür nicht ersetzt:
+
+~~~bat
+Tests\build\PipelineTests.exe "C:\Quellen\mggm-xml-validator\build\saxonc-core-he.dll" "C:\Quellen\validator-1.6.3" "C:\Pruefung\svrl-pipeline" "C:\Quellen\Validation" "C:\Quellen\mggm-xml-validator\Tests\Fixtures\reference\xr-ubl-valid.xml" "C:\Quellen\mggm-xml-validator\Tests\Fixtures\reference\xr-ubl-business-error.xml"
+~~~
+
+Mit diesen Argumenten werden 39 Fälle ausgeführt. Der öffentliche gültige Beleg wird angenommen und enthält `BR-DE-TMP-32` als Information gemäß den aktuellen Regeln. Der Geschäftsfehlerbeleg wird abgelehnt und enthält `BR-CL-01` als Fehler. Der zugehörige Java-1.6.3-Referenzlauf prüft dieselben Eingaben und dieselbe externe Konfiguration. Die Modellprojektion betrifft ausschließlich die importierte Berichtskopie: Nicht modellierte Unterbäume entfallen im jeweiligen Elternkontext, Wildcard-Inhalte bleiben opak erhalten. Findings werden weiterhin aus dem ursprünglichen SVRL-Dokument gelesen.
 
 Der Beispieltest prüft insbesondere den DLL-Pfad neben der EXE bei fremdem Arbeitsverzeichnis, fehlende DLL, ausdrückliche Pfade, fehlende Regeln, XML-Fehler und Ausgabeschutz. Der CLI-Test erwartet die Saxon-DLL neben der geprüften CLI-EXE. Deshalb vor dem Lauf die lokale Paketierung ausführen.
 

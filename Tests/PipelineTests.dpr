@@ -24,6 +24,7 @@ type
   TPipelineTestSuite = class
   private
     FLibraryFile, FUpstreamRoot, FEvidenceDirectory, FDefaultHash: string;
+    FValidationRoot, FPublicValidFile, FBusinessInvalidFile: string;
     FDefaultValidator, FErrorValidator: TMGKositValidator;
     FEvidence: TJSONObject;
     FCases: TJSONArray;
@@ -49,9 +50,12 @@ type
     procedure CheckFirstFallback;
     procedure CheckSchemaOnly;
     procedure CheckReportRuntime;
+    procedure CheckSvrlProjection(const Variant: Integer);
+    procedure CheckUpdatedXRechnung(const InvalidBusinessRules: Boolean);
     procedure ExecuteCases;
   public
-    constructor Create(const LibraryFile, UpstreamRoot, EvidenceDirectory: string);
+    constructor Create(const LibraryFile, UpstreamRoot, EvidenceDirectory: string;
+      const ValidationRoot, PublicValidFile, BusinessInvalidFile: string);
     destructor Destroy; override;
     function Execute: Integer;
   end;
@@ -93,12 +97,16 @@ begin
 end;
 
 // Evidence enthält ausschließlich Artefakte dieses Testprogramms.
-constructor TPipelineTestSuite.Create(const LibraryFile, UpstreamRoot, EvidenceDirectory: string);
+constructor TPipelineTestSuite.Create(const LibraryFile, UpstreamRoot, EvidenceDirectory: string;
+  const ValidationRoot, PublicValidFile, BusinessInvalidFile: string);
 begin
   inherited Create;
   FLibraryFile := ExpandFileName(LibraryFile);
   FUpstreamRoot := ExpandFileName(UpstreamRoot);
   FEvidenceDirectory := ExpandFileName(EvidenceDirectory);
+  FValidationRoot := ValidationRoot;
+  FPublicValidFile := PublicValidFile;
+  FBusinessInvalidFile := BusinessInvalidFile;
   FEvidence := TJSONObject.Create;
   FCases := TJSONArray.Create;
   FEvidence.AddPair('tests', FCases);
@@ -629,9 +637,195 @@ begin
   end;
 end;
 
+// Nur die Berichtskopie darf auf das Frameworkmodell begrenzt werden; die Saxon-Ausgabe bleibt die Befundquelle.
+procedure TPipelineTestSuite.CheckSvrlProjection(const Variant: Integer);
+var
+  Validator: TMGKositValidator;
+  Engine: TMGKositEngine;
+  Stream: TReadOnlySequentialStream;
+  DirectoryName, Assertions, ConfigurationFile, Configuration, RawXml, Rules: string;
+  InputBytes, RawBytes: TBytes;
+  RawDocument: IXMLDOMDocument3;
+begin
+  DirectoryName := TPath.Combine(FEvidenceDirectory, 'svrl-projection-' + IntToStr(Variant));
+  case Variant of
+    0: Assertions := '<svrl:active-pattern id="before"/><svrl:metadata><svrl:failed-assert id="HIDDEN" test="false()" location="/contract" role="error">' +
+      '<svrl:text>Kein direkter Befund</svrl:text></svrl:failed-assert></svrl:metadata><svrl:fired-rule context="contract"/>' +
+      '<svrl:failed-assert id="CUSTOM" test="false()" location="/contract" flag="fatal" role="error"><svrl:text>Umgestufter Befund</svrl:text></svrl:failed-assert>';
+    1: Assertions := '<svrl:extension><svrl:failed-assert id="WRAPPED" test="false()" location="/contract" role="error">' +
+      '<svrl:text>Verschachtelter Befund</svrl:text></svrl:failed-assert></svrl:extension><svrl:active-pattern id="retained"/>';
+    2: Assertions := '<svrl:diagnostic-reference diagnostic="WRONG-PARENT"><svrl:text>Falscher Elternknoten</svrl:text></svrl:diagnostic-reference>' +
+      '<svrl:failed-assert id="DIRECT" test="false()" location="/contract" role="warning"><svrl:active-pattern id="wrong-child"/>' +
+      '<svrl:text>Direkter Befund</svrl:text></svrl:failed-assert>';
+    3: Assertions := '<svrl:failed-assert id="RICH" test="false()" location="/contract" role="warning">' +
+      '<svrl:diagnostic-reference diagnostic="D1"><svrl:text>Diagnose</svrl:text></svrl:diagnostic-reference>' +
+      '<svrl:property-reference property="P1"><svrl:text>Eigenschaft</svrl:text></svrl:property-reference>' +
+      '<svrl:text xml:lang="de" xml:space="preserve" xmlns:ext="urn:projection-test" icon="behalten">Anfang ' +
+      '<svrl:span class="notice">Mitte</svrl:span> danach <ext:payload ext:attribute="ä" xmlns:binding="urn:retained-binding" qname="binding:Value">' +
+      '<svrl:active-pattern id="opaque"/><svrl:metadata>Fremdinhalt</svrl:metadata></ext:payload> danach ' +
+      '<local-payload marker="lokal">Lokaler Inhalt</local-payload> Ende</svrl:text></svrl:failed-assert>';
+    4: Assertions := '';
+  else
+    raise Exception.Create('Unbekannte SVRL-Testvariante');
+  end;
+  Validator := CreateContractValidator('svrl-projection-' + IntToStr(Variant), 'true()', Assertions);
+  FreeAndNil(Validator);
+  if Variant = 0 then
+  begin
+    ConfigurationFile := TPath.Combine(DirectoryName, 'scenarios.xml');
+    Configuration := TFile.ReadAllText(ConfigurationFile, TEncoding.UTF8);
+    Configuration := StringReplace(Configuration, '<acceptMatch>', '<createReport>' +
+      '<resource><name>Identity</name><location>identity.xsl</location></resource><customLevel level="warning">CUSTOM</customLevel></createReport><acceptMatch>', []);
+    TFile.WriteAllText(ConfigurationFile, Configuration, TEncoding.UTF8);
+  end;
+  if Variant = 4 then
+  begin
+    Rules := TFile.ReadAllText(TPath.Combine(DirectoryName, 'rules.xsl'), TEncoding.UTF8);
+    Rules := StringReplace(Rules, 'svrl:schematron-output', 'svrl:metadata', [rfReplaceAll]);
+    TFile.WriteAllText(TPath.Combine(DirectoryName, 'rules.xsl'), Rules, TEncoding.UTF8);
+  end;
+  InputBytes := TFile.ReadAllBytes(TPath.Combine(DirectoryName, 'input.xml'));
+  Engine := TMGKositEngine.Create(FLibraryFile);
+  try
+    Engine.ConfigureResourceRoots([DirectoryName]);
+    RawBytes := Engine.TransformBytes(InputBytes, TPath.Combine(DirectoryName, 'input.xml'), TPath.Combine(DirectoryName, 'rules.xsl'));
+    RawDocument := Engine.LoadDocumentBytes(RawBytes);
+    RawXml := RawDocument.xml;
+    TFile.WriteAllBytes(TPath.Combine(DirectoryName, 'raw-saxon.xml'), RawBytes);
+    Validator := TMGKositValidator.Create(FLibraryFile);
+    try
+      Validator.AddScenario(TPath.Combine(DirectoryName, 'scenarios.xml'), DirectoryName);
+      Stream := TReadOnlySequentialStream.Create(InputBytes);
+      try
+        FActual := Validator.ValidateStream(Stream, 'svrl-projection.xml');
+        Require((Stream.SeekCalls = 0) and (Stream.ReadCalls > 1), 'Die SVRL-Prüfung verletzte den nur lesbaren Eingabevertrag');
+      finally
+        FreeAndNil(Stream);
+      end;
+    finally
+      FreeAndNil(Validator);
+    end;
+    if Variant = 4 then
+    begin
+      CheckResult('F', kaUndefined, True, True, False);
+      Require(Pos('svrl:schematron-output', FActual.ErrorMessage) > 0, 'Falsches SVRL-Wurzelelement blieb ohne Diagnose');
+      Exit;
+    end;
+    if Variant = 1 then
+      CheckResult('V', kaAccept, True, False, True)
+    else
+      CheckResult('W', kaAccept, True, False, True);
+    case Variant of
+      0: begin
+        Require(XmlHas(RawXml, '/svrl:schematron-output/svrl:metadata/svrl:failed-assert[@id="HIDDEN"]'), 'Saxon-Original enthält keine Metadaten');
+        Require(not XmlHas(FActual.ReportInputXml, '//svrl:metadata'), 'Metadaten gelangten in die Berichtskopie');
+        Require(XmlHas(FActual.ReportInputXml, '//svrl:active-pattern[@id="before"]/following-sibling::svrl:fired-rule[@context="contract"]'),
+          'Bekannte Geschwister vor oder nach den Metadaten gingen verloren');
+        Require((Length(FActual.Findings) = 1) and (FActual.Findings[0].Code = 'CUSTOM') and (FActual.Findings[0].Level = 'warning'),
+          'Metadaten oder customLevel veränderten direkte Befunde');
+        Require(XmlHas(FActual.ReportInputXml, '//svrl:failed-assert[@id="CUSTOM" and @flag="fatal" and @role="error"]'),
+          'Die Berichtskopie verlor den ursprünglichen Schweregrad');
+      end;
+      1: begin
+        Require(XmlHas(RawXml, '/svrl:schematron-output/svrl:extension/svrl:failed-assert'), 'Originaler unbekannter Wrapper fehlt');
+        Require((Length(FActual.Findings) = 0) and not XmlHas(FActual.ReportInputXml, '//svrl:failed-assert | //svrl:extension'),
+          'Unbekannter Wrapper wurde ausgepackt oder als direkter Befund gezählt');
+        Require(XmlHas(FActual.ReportInputXml, '//svrl:active-pattern[@id="retained"]'), 'Bekannter Geschwisterknoten ging verloren');
+      end;
+      2: begin
+        Require(not XmlHas(FActual.ReportInputXml, '//svrl:schematron-output/svrl:diagnostic-reference | //svrl:failed-assert/svrl:active-pattern'),
+          'Global bekannte SVRL-Elemente blieben unter einem unzulässigen Elternknoten erhalten');
+        Require((Length(FActual.Findings) = 1) and (FActual.Findings[0].Code = 'DIRECT'), 'Direkter Befund ging bei Elternprüfung verloren');
+      end;
+      3: begin
+        Require(XmlText(FActual.ReportInputXml, '//svrl:failed-assert[@id="RICH"]/svrl:text') = 'Anfang Mitte danach Fremdinhalt danach Lokaler Inhalt Ende',
+          'Rich-Text-Inhalt oder Textreihenfolge ging verloren');
+        Require(XmlHas(FActual.ReportInputXml, '//svrl:text[@xml:lang="de" and @xml:space="preserve" and @icon="behalten"]' +
+          '/*[local-name()="payload" and namespace-uri()="urn:projection-test" and @qname="binding:Value" and @*[local-name()="attribute"]="ä"]' +
+          '[namespace::binding="urn:retained-binding"]/svrl:active-pattern[@id="opaque"]'), 'Wildcard-Attribute, Namensräume oder opaker SVRL-Inhalt gingen verloren');
+        Require(XmlHas(FActual.ReportInputXml, '//svrl:text/*[local-name()="local-payload" and namespace-uri()="" and @marker="lokal" and text()="Lokaler Inhalt"]'),
+          'Der lokale Wildcard-Unterbaum verlor Inhalt oder Attribute');
+        Require(XmlHas(FActual.ReportInputXml, '//svrl:property-reference[@property="P1"]/svrl:text') and
+          XmlHas(FActual.ReportInputXml, '//svrl:diagnostic-reference[@diagnostic="D1"]/svrl:text') and
+          XmlHas(FActual.ReportInputXml, '//svrl:text/*[local-name()="payload"]/svrl:metadata'), 'Rich-Text-Referenzen oder Wildcard-Unterbaum gingen verloren');
+        Require((Length(FActual.Findings) = 1) and (FActual.Findings[0].Code = 'RICH'), 'Opaker Wildcard-Inhalt wurde als Befund gezählt');
+      end;
+    end;
+  finally
+    RawDocument := nil;
+    FreeAndNil(Engine);
+  end;
+end;
+
+// Externe Regeln und beide fachlichen Eingaben werden ausdrücklich angegeben; gebündelte Ressourcen bleiben unverändert.
+procedure TPipelineTestSuite.CheckUpdatedXRechnung(const InvalidBusinessRules: Boolean);
+var
+  Validator: TMGKositValidator;
+  RepositoryDirectory: string;
+  Finding: TMGKositFinding;
+  ExpectedFinding, InformationFinding, WarningFinding: Boolean;
+begin
+  RepositoryDirectory := TPath.Combine(FValidationRoot, 'validator-configuration-xrechnung/3.0.2');
+  Validator := TMGKositValidator.Create(FLibraryFile);
+  try
+    Validator.AddScenario(TPath.Combine(RepositoryDirectory, 'scenarios.xml'), RepositoryDirectory);
+    if InvalidBusinessRules then
+      FActual := Validator.ValidateFile(FBusinessInvalidFile)
+    else
+      FActual := Validator.ValidateFile(FPublicValidFile);
+    ExpectedFinding := False;
+    InformationFinding := False;
+    WarningFinding := False;
+    for Finding in FActual.Findings do
+    begin
+      InformationFinding := InformationFinding or ((Finding.Code = 'BR-DE-TMP-32') and (Finding.Level = 'information'));
+      WarningFinding := WarningFinding or ((Finding.Code = 'BR-DE-17') and (Finding.Level = 'warning'));
+      if InvalidBusinessRules then
+        ExpectedFinding := ExpectedFinding or ((Finding.Code = 'BR-CL-01') and (Finding.Level = 'error'))
+      else
+        ExpectedFinding := ExpectedFinding or ((Finding.Code = 'BR-DE-TMP-32') and (Finding.Level = 'information'));
+    end;
+    Require(ExpectedFinding, 'Erwarteter fachlicher XRechnung-Befund fehlt');
+    if InvalidBusinessRules then
+    begin
+      CheckResult('E', kaReject, True, False, True);
+      Require(InformationFinding and WarningFinding and (Length(FActual.Findings) = 3) and (FActual.Errors = 1) and (FActual.Warnings = 1),
+        'Die Befundmultimenge des abgelehnten Belegs unterscheidet sich von der aktuellen Java-Referenz');
+    end
+    else
+    begin
+      CheckResult('V', kaAccept, True, False, True);
+      Require((Length(FActual.Findings) = 1) and (FActual.Errors = 0) and (FActual.Warnings = 0),
+        'Die Befundmultimenge des akzeptierten Belegs unterscheidet sich von der aktuellen Java-Referenz');
+    end;
+    Require(XmlHas(FActual.ReportInputXml, '//svrl:schematron-output/svrl:failed-assert[@id="BR-DE-TMP-32" and @flag="information"]'),
+      'Der ursprüngliche Informationsschweregrad ging in der Berichtskopie verloren');
+    Require(not XmlHas(FActual.ReportInputXml, '//svrl:schematron-output/svrl:metadata'), 'Aktuelle Schematronmetadaten verletzen die Berichtskopie');
+  finally
+    FreeAndNil(Validator);
+  end;
+end;
+
 // Erwartungen stammen aus den genannten Originaltests und der dokumentierten Original-Aktionsreihenfolge.
 procedure TPipelineTestSuite.ExecuteCases;
 begin
+  RunCase('svrl-metadata-copy-and-custom-level', 'Aktuelle Schematronmetadaten; direkte Befunde und ursprüngliche Schweregrade bleiben erhalten',
+    procedure begin CheckSvrlProjection(0); end);
+  RunCase('svrl-unknown-wrapper-no-hoisting', 'Unbekannte SVRL-Unterbäume werden als Einheit verworfen und erzeugen keine direkten Befunde',
+    procedure begin CheckSvrlProjection(1); end);
+  RunCase('svrl-known-element-wrong-parent', 'Das tatsächliche SVRL-Inhaltsmodell bestimmt erlaubte Eltern-Kind-Beziehungen',
+    procedure begin CheckSvrlProjection(2); end);
+  RunCase('svrl-rich-text-wildcard-preservation', 'Rich-Text-Wildcards bewahren Attribute, Namensräume, Textreihenfolge und opaken SVRL-Inhalt',
+    procedure begin CheckSvrlProjection(3); end);
+  RunCase('svrl-wrong-root-processing-failure', 'Ein falsches SVRL-Wurzelelement bleibt ein technischer Fehler',
+    procedure begin CheckSvrlProjection(4); end);
+  if FValidationRoot <> '' then
+  begin
+    RunCase('updated-xrechnung-public-valid', 'Externe XRechnung 3.0.2 akzeptiert öffentliche UBL-Fixture mit BR-DE-TMP-32',
+      procedure begin CheckUpdatedXRechnung(False); end);
+    RunCase('updated-xrechnung-business-invalid', 'Externe XRechnung 3.0.2 lehnt BR-CL-01 fachlich ab',
+      procedure begin CheckUpdatedXRechnung(True); end);
+  end;
   RunCase('report-framework-version', 'CreateReportAction; createReportInput.xsd version 1.0.2 und Originalbericht',
     procedure
     begin
@@ -1122,14 +1316,14 @@ begin
   Result := Ord(FFailed <> 0);
 end;
 
-// Aufruf: PipelineTests LibraryFile UpstreamRoot EvidenceDirectory.
+// Externe XRechnung-Prüfungen benötigen alle drei zusätzlichen Pfade gemeinsam.
 procedure Run;
 var
   Suite: TPipelineTestSuite;
 begin
-  if ParamCount <> 3 then
-    raise Exception.Create('Aufruf: PipelineTests LibraryFile UpstreamRoot EvidenceDirectory');
-  Suite := TPipelineTestSuite.Create(ParamStr(1), ParamStr(2), ParamStr(3));
+  if (ParamCount <> 3) and (ParamCount <> 6) then
+    raise Exception.Create('Aufruf: PipelineTests LibraryFile UpstreamRoot EvidenceDirectory [ValidationRoot PublicValidFile BusinessInvalidFile]');
+  Suite := TPipelineTestSuite.Create(ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5), ParamStr(6));
   try
     ExitCode := Suite.Execute;
   finally
