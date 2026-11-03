@@ -32,17 +32,19 @@ class SourceExportTests(unittest.TestCase):
         """Binärbytes und erlaubte Unterordner bleiben erhalten; Buildordner fehlen."""
         projects = ["MGGMXmlValidator.dpr", "MGGMXmlValidator.dproj", "MGGMXmlValidatorBatch.dpr", "MGGMXmlValidatorBatch.dproj"]
         names = ["README.md", "Source/schema.xsd", "Tests/build/Test.exe", "build/App.exe", "Evidence/result.json", "App.exe", *projects,
-                 "verify_original_test_inventory.py"]
+                 "verify_original_test_inventory.py", "download-saxon.cmd", "download-saxon.ps1"]
         for name in names:
             path = self.root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b"fixture\r\n")
         with self.listing(names):
-            self.assertEqual(export_source.export_source(self.target), 7)
+            self.assertEqual(export_source.export_source(self.target), 9)
         for project in projects:
             self.assertEqual((self.target / project).read_bytes(), b"fixture\r\n")
         self.assertEqual((self.target / "Source/schema.xsd").read_bytes(), b"fixture\r\n")
         self.assertEqual((self.target / "verify_original_test_inventory.py").read_bytes(), b"fixture\r\n")
+        for name in ("download-saxon.cmd", "download-saxon.ps1"):
+            self.assertEqual((self.target / name).read_bytes(), b"fixture\r\n")
         self.assertFalse((self.target / "build").exists())
         self.assertFalse((self.target / "Tests/build").exists())
         self.assertFalse((self.target / "Evidence").exists())

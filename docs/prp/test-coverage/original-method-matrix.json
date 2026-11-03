@@ -39,7 +39,7 @@
     ]
   },
   "supplementary_verification": {
-    
+
     "suites": [
       {
         "suite": "StreamAdapterTests",

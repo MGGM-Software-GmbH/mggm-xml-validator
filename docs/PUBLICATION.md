@@ -1,4 +1,4 @@
-# Vorbereitung des Quellrepositories
+# Quellrepository und Veröffentlichung
 
 Der MGGM XML Validator für Delphi wird unter dem Repositorynamen `mggm-xml-validator` als eigenständig nutzbares Delphi-Projekt mit Apache-2.0-Lizenz, nachvollziehbaren Drittanbieterbedingungen, Bibliothek, CLI und kleinem Dateibeispiel gepflegt. Er ist ein unabhängiges Projekt der MGGM Software GmbH und kein offizielles KoSIT-Projekt. Hinweise auf KoSIT benennen die Herkunft übernommener Ressourcen und des ursprünglichen Validierungsablaufs.
 
@@ -10,13 +10,19 @@ Der Quellstand enthält ausschließlich Bibliothek, Konsolenprogramme, generisch
 
 Die Prüfung umfasst Build, Bytevergleich der eingebetteten Ressourcen, Paketierungsgegenproben, den Start aus einem fremden Arbeitsverzeichnis sowie gültige und fehlerhafte XML-Eingaben. Ergebnisse stehen in [Tests/publication-verification.json](../Tests/publication-verification.json). Für eine externe Binärweitergabe bleibt die in [THIRD_PARTY.md](../THIRD_PARTY.md) erläuterte SaxonC-Quellcodezuordnung zu klären.
 
-## Privates GitHub-Quellrepository
+## GitHub-Quellrepository
 
 GitHub unterstützt private Repositories. Sie sind für berechtigte Benutzer und bei Organisationsrepositories insbesondere für Organisationsinhaber sichtbar. Zusätzliche Organisationsrechte und Teamberechtigungen bestimmen den weiteren Zugriff. `Private` bedeutet daher nicht, dass allein der Ersteller Zugriff hat. Grundlage: [GitHub-Dokumentation zur Sichtbarkeit](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories).
 
-Das GitHub-Ziel ist [MGGM-Software-GmbH/mggm-xml-validator](https://github.com/MGGM-Software-GmbH/mggm-xml-validator) mit Sichtbarkeit `private`. Für den Upload werden keine zusätzlichen Personen oder Teams berechtigt. Bestehende Organisationsrechte gelten weiterhin. Die Sichtbarkeit wird vor dem Push und anschließend erneut über die GitHub-API geprüft.
+Das GitHub-Ziel ist [MGGM-Software-GmbH/mggm-xml-validator](https://github.com/MGGM-Software-GmbH/mggm-xml-validator). Die Sichtbarkeit wird gesondert in den Repository-Einstellungen festgelegt; ein Push ändert sie nicht. Für den Upload werden keine zusätzlichen Personen oder Teams berechtigt. Bestehende Organisationsrechte gelten weiterhin.
 
-Der hochgeladene Stand enthält den vorhandenen Produktcode und das [PRP zur gezielten Testerweiterung](prp/test-coverage/PRP.md). Das PRP beschreibt geplante Arbeiten; diese Testerweiterung wird durch den Upload nicht umgesetzt. Es wird kein Binärrelease erzeugt.
+Der Quellstand enthält die im [PRP zur gezielten Testerweiterung](prp/test-coverage/PRP.md) beschriebene Testabdeckung. Die Methodenmatrix, die Prüfnachweise und [TESTING.md](TESTING.md) beschreiben Zuordnung, Ergebnisse und Ausführung. Ein Upload des Quellcodes erzeugt kein Binärrelease.
+
+Die Nachweise enthalten öffentliche Quellpfade, Hashes, Lauf-IDs und Ergebnisse. Verweise auf fest gespeicherte interne Prüfdateien gehören nicht in den Quellstand oder seine veröffentlichte Git-Historie.
+
+## Direkter Bezug der Saxon-DLL
+
+Mit `download-saxon.cmd` bezieht der Benutzer das festgelegte Herstellerpaket direkt von Saxonica. Die zugehörige PowerShell-Datei prüft ZIP- und DLL-Hash und installiert DLL und Originalhinweise im Anwendungsverzeichnis, standardmäßig unter `build`. Der [README](../README.md#bauen-und-lokal-paketieren) beschreibt Aufruf und abweichende Ziele. Über GitHub wird dabei keine Saxon-DLL verteilt. Die offene Quellcodezuordnung betrifft weiterhin ein separat weitergegebenes Binärpaket.
 
 ## Export ohne fremde Historie
 

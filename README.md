@@ -133,6 +133,23 @@ Eine ausführbare Fassung des Streambeispiels steht unter [Examples/ValidateXmlE
 
 ## Bauen und lokal paketieren
 
+Die geprüfte SaxonC-HE-DLL kann direkt beim Hersteller bezogen werden. Unter Windows mit Windows PowerShell 5.1 oder neuer aus dem Repositoryverzeichnis:
+
+~~~bat
+download-saxon.cmd
+~~~
+
+Die CMD-Datei startet den mitgelieferten PowerShell-Helfer und installiert `saxonc-core-he.dll` unter `build`, unabhängig vom aktuellen Arbeitsverzeichnis. Für einen anderen Anwendungsordner genau ein Zielverzeichnis übergeben; relative Ziele beziehen sich auf das Skriptverzeichnis:
+
+~~~bat
+download-saxon.cmd "build\Delphi13"
+download-saxon.cmd "C:\Programme\MeinValidator"
+~~~
+
+Heruntergeladen wird ausschließlich das offizielle SaxonC-HE-12.10.1-Paket für Windows x86_64. Vor der Installation werden ZIP und DLL anhand ihrer festgelegten SHA-256 geprüft. Die drei Originalhinweise werden unter `Notices/SaxonC/SDK` im Ziel mitgeführt. Vorhandene identische Dateien bleiben erhalten; abweichende Dateien, Downloadfehler und Hashabweichungen führen zu einem Fehler mit Exitcode ungleich 0. Der Helfer lädt keine Prüfregeln, installiert keine Visual-C++-Laufzeit und verändert keine Szenarien.
+
+Die DLL wird vom Benutzer direkt von Saxonica heruntergeladen und nicht über dieses Repository verteilt. Die Bedingungen für eine spätere eigene Binärweitergabe stehen in [THIRD_PARTY.md](THIRD_PARTY.md).
+
 Die Projekte werden für Win64 gebaut. In der zur gewählten Compiler-Version gehörenden Delphi-Eingabeaufforderung:
 
 ~~~bat

@@ -17,7 +17,7 @@ GENERATED_SUFFIXES = {
 ROOT_FILES = {".gitattributes", ".gitignore", "README.md", "LICENSE", "NOTICE", "THIRD_PARTY.md",
               "MGGMXmlValidator.dpr", "MGGMXmlValidator.dproj", "MGGMXmlValidatorBatch.dpr", "MGGMXmlValidatorBatch.dproj", "uKositCli.pas",
               "package_runtime.py", "export_source.py", "compare_reports.py", "compare_benchmark.py", "collect_benchmark.py",
-              "verify_original_test_inventory.py"}
+              "verify_original_test_inventory.py", "download-saxon.cmd", "download-saxon.ps1"}
 
 
 def validate_source(root, relative):

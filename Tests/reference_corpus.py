@@ -45,7 +45,7 @@ def safe_path(root, relative):
 
 
 def validate_fixtures(directory):
-    """Prüft Fallidentität, Provenienz, Lizenz und unveränderte Originalbytes."""
+    """Prüft lokale Bytes, Quellidentität, deklarierte Zeilenenden und Lizenz."""
     directory = Path(directory).resolve()
     manifest = read_json(directory / "fixture-manifest.json")
     cases = manifest.get("cases", [])
@@ -79,6 +79,33 @@ def validate_fixtures(directory):
             raise ValueError(f"Lizenz fehlt: {name}")
         if sha256(license_path) != source["license_sha256"]:
             raise ValueError(f"Lizenz-SHA-256 abweichend: {name}")
+        if source.get("repository"):
+            identity = (source["repository"], source["commit"], source["original_path"], source["original_sha256"])
+            if not re.fullmatch(r"[0-9a-f]{40}", identity[1]) or not re.fullmatch(r"[0-9a-f]{64}", identity[3]):
+                raise ValueError(f"Ungültige Quellidentität: {name}")
+            if not isinstance(source["derived"], bool):
+                raise ValueError(f"Ableitungsangabe muss boolesch sein: {name}")
+            if source.get("line_ending_normalization") != "lf-to-crlf":
+                raise ValueError(f"Unbekannte Zeilenendennormalisierung: {name}")
+            if not source["derived"]:
+                content = path.read_bytes()
+                original = content.replace(b"\r\n", b"\n")
+                if b"\r" in original or original.replace(b"\n", b"\r\n") != content:
+                    raise ValueError(f"Zeilenendennormalisierung abweichend: {name}")
+                if hashlib.sha256(original).hexdigest() != source["original_sha256"]:
+                    raise ValueError(f"Original-SHA-256 nach Zeilenendennormalisierung abweichend: {name}")
+    # Ableitungen müssen auf eine im selben Bestand geprüfte öffentliche Quelle zeigen.
+    originals = {
+        (source["repository"], source["commit"], source["original_path"], source["original_sha256"])
+        for case in cases for source in [case["source"]]
+        if source.get("repository") and not source["derived"]
+    }
+    for case in cases:
+        source = case["source"]
+        if source.get("repository") and source["derived"]:
+            identity = (source["repository"], source["commit"], source["original_path"], source["original_sha256"])
+            if identity not in originals:
+                raise ValueError(f"Ungeprüfte Originalquelle der Ableitung: {case['name']}")
     return manifest
 
 

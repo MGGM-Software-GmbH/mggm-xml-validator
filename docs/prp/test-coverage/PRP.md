@@ -111,7 +111,7 @@ Pflichtspalten:
 | `classification` | `covered`, `new` oder `not_relevant` |
 | `reason` | Begründung der Zuordnung, bei Ausschluss genaue Umfangs- oder API-Grenze |
 | `target` | Delphi-/Python-Datei, Fallname und konkrete Assertion; bei neuen Fällen Zielrunner |
-| `evidence` | Lauf-ID, Ergebnis und Artefaktverweis nach Umsetzung |
+| `evidence` | Lauf-ID und Ergebnis |
 
 `covered` erfordert einen belegten gleichwertigen Prüfinhalt. Eine Namensähnlichkeit reicht nicht.
 `new` benennt eine konkrete Lücke, keine automatische Eins-zu-eins-Portierung der Java-Methode.

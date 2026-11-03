@@ -21,10 +21,10 @@ isolierten Gegenproben. Die Quellenbindung ersetzt nicht die in jedem
 Matrixeintrag gesondert begründete fachliche Gleichwertigkeit.
 
 Die zehn ausgewählten Referenzfälle liegen unter `Tests/Fixtures/reference`.
-Die beiden unveränderten UBL-/CII-Beispiele und vier gekennzeichnete Ableitungen
+Die beiden inhaltlich unveränderten UBL-/CII-Beispiele und vier gekennzeichnete Ableitungen
 stammen aus der KoSIT-XRechnung-Testsuite, Commit
 `04cb0e80c14aaa4fb40c1118846570756dc534cd`, mit mitgeführter Apache-2.0-Lizenz.
-Vier Parser- und Szenariofälle sind synthetisch. Die ZUGFeRD-/Factur-X-Ableitungen
+Bei den beiden Ausgangsbeispielen sind ausschließlich die Zeilenenden von LF auf CRLF normalisiert. Das Fixture-Manifest unterscheidet Git-Quellhash und lokalen Dateihash; der Runner prüft die rücktransformierten Originalbytes offline. Vier Parser- und Szenariofälle sind synthetisch. Die ZUGFeRD-/Factur-X-Ableitungen
 prüfen EN16931/Comfort mit ZUGFeRD 2.5.2 / Factur-X 1.09.2 und sind keine offiziellen
 FeRD-Beispiele. Es werden keine privaten Rechnungen verwendet.
 
@@ -41,8 +41,7 @@ Bestandteile des Fixture-Verzeichnisses ausgegeben.
 Der Java-Referenzlauf verwendet die Laufmanifest-ID
 `reference-verified-bb5413987e9748459bdacba2ae36690a` und die Vorbereitung am
 1. November 2026 um 19:20:49 UTC mit Python 3.12.3.
-Der SHA-256 des Fixture-Manifests lautet
-`ffb32c88174f760139bb84b0deb88a06b6505148fc427e76ec7a0bea7a48cb8b`.
+Die zugehörige Manifestbindung steht im maschinenlesbaren Laufnachweis. Das aktuelle Fixture-Manifest bindet dieselben lokalen XML-Bytes und zusätzlich ihre tatsächlichen Git-Quellhashes.
 
 Der Java-Nachweis dokumentiert Java 21.0.12.1, den Start am 1. November 2026
 um 19:20:52 UTC und die Ausführungs-ID `c61c16edae3a48698600d265fb7dc352`.
@@ -51,7 +50,7 @@ Das lokale Standalone-JAR 1.6.3 hat SHA-256
 Es wurde direkt ohne Maven gestartet. Der tatsächliche Java-Exitcode ist 7 und
 entspricht den sieben erwarteten Ablehnungen unter zehn Eingaben.
 
-Die frischen nativen Läufe prüfen dieselben Originalbytes. Beide ergeben ebenfalls
+Die nativen Läufe prüfen dieselben lokalen XML-Bytes. Beide ergeben ebenfalls
 Exitcode 7 und bestehen den strengen Berichtvergleich mit 10/10 Fällen sowie
 17/17 Laufzeitgegenproben. Die drei angenommenen Eingaben enthalten einen
 ZUGFeRD-Fall mit Warnung. Annahme bedeutet deshalb nicht automatisch Berichtgültigkeit.
@@ -69,12 +68,12 @@ vollständigen SHA-256 `6bbb8d533753b109649477f560df378d2e55091903ea0b3141bc314c
 
 Programme werden in Release und Testprogramme in Debug gebaut, jeweils für Win64.
 Die aktuellen Build-IDs, Lauf-IDs und Datei-Hashes stehen im
-[maschinenlesbaren Prüfnachweis](../../../Tests/publication-verification.json).
+[maschinenlesbaren Prüfnachweis](../../../Tests/publication-verification.json). Die aktuelle SVRL-Erweiterung und ihre Läufe stehen im [SVRL-Prüfnachweis](../../../Tests/svrl-metadata-verification.json).
 
 | Runner | Delphi 11 | Delphi 13 |
 |---|---|---|
 | EngineTests | 59/59 | 59/59 |
-| PipelineTests | 32/32 | 32/32 |
+| PipelineTests einschließlich aktueller XRechnung-Regeln | 39/39 | 39/39 |
 | CliTests | 56/56 | 56/56 |
 | NativeReuseTests | 22/22 | 22/22 |
 | MemoryTransferTests | 14/14 | 14/14 |
@@ -82,7 +81,7 @@ Die aktuellen Build-IDs, Lauf-IDs und Datei-Hashes stehen im
 | ParallelEngineTests | 16 Aufrufe, 8 überlappende Runden | 16 Aufrufe, 8 überlappende Runden |
 | DelphiExampleTests | 17/17 | 17/17 |
 
-Die Python-Suite besteht 130/130 Tests. Sie prüft unter anderem die Inventur,
+Die Python-Suite besteht 151/151 Tests. Sie prüft unter anderem die Inventur,
 Fixture- und Regelbindung, Gegenproben des Berichtvergleichs, Ressourcen,
 Paketierung und Exportgrenzen. Server-, Daemon- und HTTP-Endpunkttests wurden
 nicht übernommen.
@@ -126,7 +125,7 @@ beiden Compilern mit den folgenden Lauf-IDs.
 Der Vergleich prüft Szenario, Annahme, öffentlichen Status, Berichtgültigkeit,
 Prüfphasen einschließlich übersprungener Phasen und Befund-Multimengen. Code,
 Schweregrad, Location, Phase und fachlicher Text bleiben Teil jedes Befunds.
-Er prüft Eingabehashes gegen Originalbytes, Berichtseingaben gegen das lokale XSD
+Er prüft Eingabehashes gegen die versionierten Eingabebytes, Berichtseingaben gegen das lokale XSD
 mit `xmllint --nonet` sowie Inhalte der XML- und HTML-Berichte.
 
 17 isolierte Laufzeitgegenproben gehören zum Werkzeug: Annahme, Status,

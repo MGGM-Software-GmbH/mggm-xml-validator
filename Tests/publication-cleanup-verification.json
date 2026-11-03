@@ -1,0 +1,62 @@
+{
+  "checked_at_utc": "2026-11-03T17:35:00.722029+00:00",
+  "scope": "Bereinigung interner Prüfdateiverweise, transparente Fixture-Herkunft und direkter SaxonC-Herstellerdownload.",
+  "history": {
+    "revisions_checked": 5,
+    "revisions_with_path_removal": 2,
+    "unchanged_older_revisions": 3,
+    "internal_proof_file_references": 0,
+    "json_valid": true,
+    "source_and_fixture_bytes_unchanged": true,
+    "other_metadata_values_preserved": true,
+    "scope": "Alle über main erreichbaren Commitstände vor dem zusätzlichen Bereinigungscommit."
+  },
+  "python": {
+    "command": "python3 -m unittest discover -s Tests",
+    "passed": 151,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "download": {
+    "official_url": "https://downloads.saxonica.com/SaxonC/HE/12/SaxonCHE-windows-x86_64-12-10-1.zip",
+    "zip_sha256": "319d23516d2290491149ad71831c3b54ac3b61dba137e03ed88df60f03ce48d2",
+    "powershell_version": "7.6.9",
+    "host_platform": "Linux",
+    "real_manufacturer_download": true,
+    "exit_code": 0,
+    "elapsed_seconds": 4.331,
+    "files": {
+      "saxonc-core-he.dll": "2a15c4631efa5b45a86b63b0618da32acf5552abf653c36b54f1b2932df94a6c",
+      "Notices/SaxonC/SDK/JAMESCLARK.txt": "5ab9010ccbd4484cea8e06259b64d1bb2c2d44c5df39734966ffda88a435f64c",
+      "Notices/SaxonC/SDK/JLINE2.txt": "0023908531e9ffcdde0799f18f7e7d592f0a30af904e4d024bb35177e4b26f19",
+      "Notices/SaxonC/SDK/LICENSE.txt": "874469ffb0080c507bf801cc6f7c7c1679f0430a10209c9fab48823c2b47bedb"
+    },
+    "foreign_working_directory": true,
+    "target_with_spaces": true,
+    "isolated_regression_cases": 10,
+    "windows_cmd_execution": "Nicht ausgeführt: Der Windows-Ausführungszugang lehnt cmd.exe mit PATH_NOT_ALLOWED ab."
+  },
+  "fixtures": {
+    "manifest_sha256": "f46e6a57b9c787c20f95b4253b764a4b0a94d1aeb347683559c9ddcf4104b847",
+    "xml_bytes_unchanged": true,
+    "license_bytes_unchanged": true,
+    "source_identity_offline_verified": true,
+    "originals": [
+      {
+        "file": "xr-ubl-valid.xml",
+        "local_sha256": "0efafa05c74d06ff25bbc2b70bcb2e9f14b97d22a4b33c5e92838bf2cc8986cb",
+        "git_source_sha256": "74fb09c609d5fba15a8c543060998d3b92858f56a81fb5b0ed244d6794e498d1",
+        "normalization": "LF auf CRLF, sonst bytegleich"
+      },
+      {
+        "file": "xr-cii-valid.xml",
+        "local_sha256": "e58a673aa659973ba190c25fd583050af3239a58b3ab04b1c2b2583920d203e6",
+        "git_source_sha256": "727b51982a84c9b406599a7384783570910440ed405c9bb6d918b22442636886",
+        "normalization": "LF auf CRLF, sonst bytegleich"
+      }
+    ]
+  },
+  "unchanged_delphi_source": "Die Validatorimplementierung, ihre eingebetteten Frameworkressourcen und alle XML-Fixtures wurden gegenüber dem geprüften Stand bytegleich erhalten. Keine erneuten Delphi-Builds für diese Skript- und Dokumentationsbereinigung.",
+  "distribution": "Das Quellrepository enthält keine DLL. Der Downloader bezieht sie vom Hersteller; die offene Quellcodezuordnung bei eigener Binärweitergabe bleibt in THIRD_PARTY.md dokumentiert."
+}

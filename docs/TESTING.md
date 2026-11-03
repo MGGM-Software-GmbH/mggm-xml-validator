@@ -17,6 +17,10 @@ python -m unittest discover -s Tests
 
 Die Tests verwenden isolierte Verzeichnisse für Gegenproben. Sie prüfen Paketinhalt und Konflikte, Exportgrenzen, Berichtvergleich und eingebettete Ressourcen. Der Ressourcenvergleich benötigt weder DLL noch Regelpaket.
 
+Die Downloader-Tests benötigen `pwsh` oder `powershell.exe`. Sie führen den PowerShell-Helfer mit kleinen isolierten ZIP-Dateien aus und prüfen erfolgreiche Installation, Wiederholung, Hash-, Transport- und ZIP-Fehler sowie Zielkonflikte. Ohne PowerShell werden diese Fälle als übersprungen ausgewiesen. Die normalen Tests laden keine Herstellerdateien herunter. Ein echter Herstellerdownload ist separat zu prüfen; die native Windows-CMD-Ausführung ist durch einen Linux-PowerShell-Lauf nicht nachgewiesen.
+
+Der [Prüfnachweis zur Veröffentlichungsbereinigung](../Tests/publication-cleanup-verification.json) dokumentiert die 151 Python-Fälle, den tatsächlichen Herstellerdownload unter PowerShell und die Prüfung der bereinigten Historie. Die dort genannte Windows-CMD-Prüfung ist ausdrücklich offen.
+
 Die Delphi-Testprogramme werden jeweils über ihre `.dproj` in Debug gebaut und mit den folgenden Argumenten gestartet. Ergebnisziele sind für jeden Lauf neu zu wählen. `DLL` bezeichnet einen absoluten Pfad; `ValidationRoot` ist das `Validation`-Verzeichnis des jeweiligen Laufzeitpakets. `CLIExe` und `ExampleExe` bezeichnen dessen CLI beziehungsweise Beispielprogramm. Die Delphi-Programme eines Laufs stammen aus demselben Compiler-Build. Testberichte enthalten die tatsächlich ausgeführten Fälle.
 
 | Projekt | Argumente |
@@ -61,7 +65,7 @@ Die Prüfung bindet Methoden, Fundstellen, Varianten, Hilfsdateien, Vererbung un
 
 ## Lokaler Java-/Delphi-Referenzlauf
 
-Der Korpus unter `Tests/Fixtures/reference` enthält zehn Fälle: unveränderte XRechnung-UBL-/CII-Beispiele, einen Schemafehler, Geschäftsregelverstöße, ZUGFeRD-/Factur-X EN16931/Comfort sowie Parser-, DTD- und Szenariofehler. `fixture-manifest.json` legt die Erwartungen und Eingabehashes fest. `rule-hashes.json` bindet die gesamte lokale Regeldateimenge einschließlich der drei Szenariokonfigurationen. Zusätzliche, fehlende oder veränderte Regeldateien sind Fehler.
+Der Korpus unter `Tests/Fixtures/reference` enthält zehn Fälle: inhaltlich unveränderte XRechnung-UBL-/CII-Beispiele mit deklarierten CRLF-Zeilenenden, einen Schemafehler, Geschäftsregelverstöße, ZUGFeRD-/Factur-X EN16931/Comfort sowie Parser-, DTD- und Szenariofehler. `fixture-manifest.json` legt Erwartungen, lokale Eingabehashes, tatsächliche Git-Quellhashes und die Zeilenendennormalisierung fest. Der Runner prüft diese Herkunftsbindung offline. `rule-hashes.json` bindet die gesamte lokale Regeldateimenge einschließlich der drei Szenariokonfigurationen. Zusätzliche, fehlende oder veränderte Regeldateien sind Fehler.
 
 Voraussetzungen sind Python, das lokale KoSIT-Standalone-JAR 1.6.3, Java und `xmllint` im Suchpfad sowie die gebauten Win64-Programme mit ihrer SaxonC-HE-DLL. `xmllint --nonet` prüft die Berichtseingabe gegen `Source/createReportInput.xsd`. Der ausgewählte Referenzlauf verwendet das JAR direkt und benötigt Maven nicht. Nach lokaler Bereitstellung der Abhängigkeiten benötigen diese Schritte keinen Internetzugriff.
 

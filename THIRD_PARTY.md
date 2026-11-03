@@ -14,6 +14,8 @@ Verwendet wird **The Saxon XSLT and XQuery Processor from Saxonica Limited**, [S
 
 MPL 2.0, Abschnitt 3.2, verlangt bei Binärweitergabe die Verfügbarkeit des zugehörigen Quellcodes und einen Bezugshinweis. Die [Herkunftsdokumentation](ThirdParty/SaxonC/SOURCE.md) verlinkt die verfügbaren Quellen. **Offen bleibt vor einer externen Binärweitergabe die genaue Quellcodezuordnung von SaxonC-HE 12.10.1 und der darin enthaltenen nativen Laufzeitbestandteile.** Das öffentlich gelistete C-Quellarchiv trägt Version 12.9.0; es wird nicht als identischer Quellstand der aktuellen DLL ausgegeben. Ein reiner Quellcodeexport dieses Delphi-Projekts enthält die DLL nicht.
 
+[download-saxon.cmd](download-saxon.cmd) ermöglicht stattdessen den direkten Bezug des unveränderten Herstellerpakets durch den Benutzer. Der Helfer prüft ZIP- und DLL-Hash und übernimmt neben der DLL die drei Originalhinweise aus dem Paket. MGGM stellt mit dem Quellrepository keine Saxon-Binärdatei bereit. Der direkte Herstellerdownload klärt nicht automatisch die Pflichten einer späteren eigenen Weitergabe der DLL; dafür gilt weiterhin der vorstehende offene Punkt.
+
 ## Prüfregeln
 
 Die drei verwendeten Konfigurationen und ihre technischen Abhängigkeiten bleiben unverändert. Das Laufzeitpaket enthält die Regeln unter `Validation` und die zusätzlichen Lizenzhinweise unter `Notices/Validation`. Die Herkunft ist in [ThirdParty/Validation/SOURCES.md](ThirdParty/Validation/SOURCES.md) dokumentiert.
@@ -29,7 +31,7 @@ Für ZUGFeRD beruht die Anwendung auf der veröffentlichten Spezifikation; die W
 
 ## Testrechnungen und Referenzfälle
 
-Die beiden unveränderten XRechnung-Beispiele unter `Tests/Fixtures/reference` stammen aus der [KoSIT-XRechnung-Testsuite](https://github.com/itplr-kosit/xrechnung-testsuite/tree/04cb0e80c14aaa4fb40c1118846570756dc534cd), Commit `04cb0e80c14aaa4fb40c1118846570756dc534cd`. Für diese Dateien und vier daraus abgeleitete Rechnungen gilt die mitgeführte [Apache-2.0-Lizenz](Tests/Fixtures/reference/XRechnung-Testsuite-LICENSE). Originalpfade, Originalhashes, Änderungen und Lizenzhashes stehen im [Fixture-Manifest](Tests/Fixtures/reference/fixture-manifest.json).
+Die beiden inhaltlich unveränderten XRechnung-Beispiele unter `Tests/Fixtures/reference` stammen aus der [KoSIT-XRechnung-Testsuite](https://github.com/itplr-kosit/xrechnung-testsuite/tree/04cb0e80c14aaa4fb40c1118846570756dc534cd), Commit `04cb0e80c14aaa4fb40c1118846570756dc534cd`. Ihre Zeilenenden sind von LF auf CRLF normalisiert. Für diese Dateien und vier daraus abgeleitete Rechnungen gilt die mitgeführte [Apache-2.0-Lizenz](Tests/Fixtures/reference/XRechnung-Testsuite-LICENSE). Originalpfade, getrennte Quell- und lokale Hashes, Änderungen und Lizenzhashes stehen im [Fixture-Manifest](Tests/Fixtures/reference/fixture-manifest.json).
 
 Die vier abgeleiteten Rechnungen kennzeichnen ihre Änderungen im XML. Die ZUGFeRD-/Factur-X-Fälle sind Ableitungen des CII-Beispiels für das angegebene EN16931-/Comfort-Szenario, keine offiziellen FeRD-Beispiele. Vier zusätzliche synthetische Parser- und Szenariofälle unterliegen der Projektlizenz. Die [Fixture-Dokumentation](Tests/Fixtures/reference/README.md) beschreibt die Herkunft und den jeweiligen Zweck. Private Rechnungsdaten werden für diesen Korpus nicht verwendet.
 
