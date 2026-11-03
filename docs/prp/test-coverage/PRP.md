@@ -219,6 +219,6 @@ Die Methodenmatrix kann zusätzliche öffentliche Verträge oder echte Unterschi
 Engines offenlegen. Unklare Verträge, nicht verfügbare Regeln oder ungeklärte Fixture-Lizenzen
 benötigen eine konkrete Entscheidung; sie werden nicht durch erfundene Erwartungen ersetzt.
 Die versionierten Referenz-Fixtures enthalten Lizenz- und Herkunftsnachweise.
-Regelpakete, Java-JAR, native DLL und Compiler bleiben lokale Voraussetzungen.
+Die Regelpakete liegen unter `build/Validation` im Repository. Java-JAR, native DLL und Compiler bleiben separat bereitzustellende Voraussetzungen.
 Ihre Identität und die tatsächlich geprüften Ergebnisse sind pro Lauf nachzuweisen;
 die Veröffentlichung der Quellen ersetzt keinen Lauf auf weiteren Plattformen.

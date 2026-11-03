@@ -10,3 +10,6 @@ Source/identity.xsl -text
 Tests/Fixtures/reference/*.xml -text whitespace=-blank-at-eol
 Tests/Fixtures/reference/*.json -text
 Tests/Fixtures/reference/XRechnung-Testsuite-LICENSE -text
+
+# Mitgelieferte Prüfregeln behalten ihre Bytes und ursprünglichen Textformatierungen.
+build/Validation/** -text whitespace=-blank-at-eol

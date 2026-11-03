@@ -1,0 +1,36 @@
+{
+  "checked_at_utc": "2026-11-03T19:40:04.501973+00:00",
+  "bundled_files": 219,
+  "bundled_bytes": 21408039,
+  "original_rule_bytes_preserved": true,
+  "rules_sha256": "bb36f36779ca35bdde59b0586e2805d3e7f21b7a95ac78d466a5f7fc34df97e3",
+  "python": {
+    "passed": 159,
+    "failed": 0,
+    "skipped": 0
+  },
+  "native_cli": [
+    {
+      "delphi": 11,
+      "cases": 10,
+      "expectations_match": true,
+      "exit_code": 7,
+      "duration_ms": 688
+    },
+    {
+      "delphi": 13,
+      "cases": 10,
+      "expectations_match": true,
+      "exit_code": 7,
+      "duration_ms": 672
+    }
+  ],
+  "factur_x_en16931_scenario": "ZUGFeRD 2.5.2/Factur-X 1.09.2 - Comfort (EN16931)",
+  "real_packaging": {
+    "exit_code": 0,
+    "rule_files_byte_equal": 219
+  },
+  "delphi_source_changed": false,
+  "configuration_notice": "Die Szenariodatei trägt neuere Versionsangaben als die unverändert übernommenen technischen XRechnung-Regeldateien; SOURCES.md dokumentiert den tatsächlichen Bestand.",
+  "native_cli_exit_code_meaning": "Exitcode 7 entspricht den sieben absichtlich nicht angenommenen Fällen je Lauf; alle zehn Ergebnisse entsprechen den Erwartungen."
+}

@@ -14,14 +14,14 @@ Damit verbindet das Laufzeitpaket die Prüfung von XRechnung mit der Prüfung de
 
 KoSIT trennt Prüfengine und Prüfregeln: Mit der XRechnung-Konfiguration wird XRechnung geprüft; für ZUGFeRD/Factur-X werden die zusätzlichen Regeln benötigt. **Dieselbe ZUGFeRD-/Factur-X-Konfiguration kann auch mit dem Original-KoSIT-Validator unter Java verwendet werden.** Der zusätzliche Formatumfang entsteht durch die Zusammenstellung der Regeln und ist keine Einschränkung der KoSIT-Engine.
 
-Die Regeln werden bei der [lokalen Paketierung](#bauen-und-lokal-paketieren) unter `build/Validation` übernommen. Im Git-Quellstand werden sie über ihre Herkunft referenziert. Die XML-Prüfung umfasst keine Prüfung des PDF-Containers oder der PDF/A-Konformität.
+Die technischen Prüfregeln sind unter [`build/Validation`](build/Validation) im Repository enthalten und stehen nach dem Klonen direkt bereit. Ein separater Regeldownload ist für diesen Bestand nicht erforderlich. Herkunft, Lizenzhinweise und die angepasste EN16931-Szenariozuordnung sind unter [ThirdParty/Validation/SOURCES.md](ThirdParty/Validation/SOURCES.md) dokumentiert. Die XML-Prüfung umfasst keine Prüfung des PDF-Containers oder der PDF/A-Konformität.
 
 ## Voraussetzungen
 
 - Windows x64 mit registriertem MSXML 6.
 - Geprüft mit Delphi 11 Alexandria und Delphi 13 Florence, jeweils für Win64.
 - Unveränderte `saxonc-core-he.dll` aus SaxonC-HE 12.10.1 für Windows x86_64 sowie deren benötigte Visual-C++-Laufzeit.
-- Passende lokale Szenariokonfigurationen und Prüfregeln für das gewünschte Rechnungsformat.
+- Die mitgelieferten Szenariokonfigurationen und Prüfregeln unter `build/Validation` oder ausdrücklich bereitgestellte andere Regeln.
 
 Die native Anbindung ist auf diese SaxonC-Core-Version geprüft. Andere Versionen und Win32 werden nicht als kompatibel vorausgesetzt. Für zusätzliche Lizenzbedingungen und die noch offene Quellcodezuordnung des Binärpakets siehe [THIRD_PARTY.md](THIRD_PARTY.md).
 
@@ -160,23 +160,25 @@ msbuild Examples\ValidateXmlExample.dproj /t:Build /p:Config=Release /p:Platform
 
 Die EXEs entstehen unter `build`, mit Delphi 13 unter `build/Delphi13`. Ein Wechsel der Konfiguration erfordert einen erneuten Build der betroffenen Projekte. Die Compilerzwischenprodukte werden nach Version, Plattform, Konfiguration und Projekt getrennt, damit verschiedene Compiler ihre DCUs nicht gemeinsam verwenden.
 
-Das [offizielle SaxonC-HE-12.10.1-Paket](https://downloads.saxonica.com/SaxonC/HE/12/SaxonCHE-windows-x86_64-12-10-1.zip) beispielsweise nach `Vendor\SaxonC` entpacken. Dort müssen `SaxonCCoreHE\bin\saxonc-core-he.dll` und `notices` vorhanden sein. Die gewünschten Regelverzeichnisse unter `Validation` bereitstellen. Herkunft: [von MGGM mitentwickelte ZUGFeRD-/Factur-X-Konfiguration bei Landrix Software](https://github.com/LandrixSoftware/validator-configuration-zugferd), [XRechnung-Konfiguration 3.0.2](https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/tag/release-2024-06-20).
+Für die Programme unter `build` genügen der Saxon-Download und der Build: `build/Validation` ist bereits im Klon enthalten. Die Beispielanwendung kann anschließend direkt aufgerufen werden. Für das CMD-Beispiel `Examples\validate.cmd` nach `build\validate.cmd` kopieren. Binärprogramme und DLL werden im Repository nicht mitgeliefert.
+
+Für ein zusätzlich paketiertes Laufzeitverzeichnis das [offizielle SaxonC-HE-12.10.1-Paket](https://downloads.saxonica.com/SaxonC/HE/12/SaxonCHE-windows-x86_64-12-10-1.zip) beispielsweise nach `Vendor\SaxonC` entpacken. Dort müssen `SaxonCCoreHE\bin\saxonc-core-he.dll` und `notices` vorhanden sein. Der Paketierer verwendet standardmäßig die mitgelieferten Regeln unter `build\Validation`.
 
 ~~~bat
-python package_runtime.py --sdk "Vendor\SaxonC" --validation-root "Validation"
+python package_runtime.py --sdk "Vendor\SaxonC"
 ~~~
 
 Für das getrennte Delphi-13-Laufzeitpaket werden alle drei EXE-Pfade und das Ziel ausdrücklich angegeben:
 
 ~~~bat
-python package_runtime.py --sdk "Vendor\SaxonC" --validation-root "Validation" ^
+python package_runtime.py --sdk "Vendor\SaxonC" ^
   --executable "build\Delphi13\MGGMXmlValidator.exe" ^
   --batch-executable "build\Delphi13\MGGMXmlValidatorBatch.exe" ^
   --example-executable "build\Delphi13\ValidateXmlExample.exe" ^
   --target "build\Delphi13"
 ~~~
 
-Der Paketierer prüft DLL-Hash, das Vorhandensein der drei Szenariodateien, Lizenzdateien und Zielkonflikte vor dem Kopieren. Er übernimmt die technischen Regeln unter `build\Validation`, ergänzt DLL, Beispiel-CMD und Hinweise und schreibt ein Hashmanifest. Vorhandene fremde oder veränderte Zieldateien werden nicht still überschrieben. `--target` erlaubt einen anderen Paketordner; die drei EXE-Pfade können ebenfalls ausdrücklich angegeben werden. Ob die Regeln einschließlich ihrer Importe verwendbar sind, prüft anschließend ein tatsächlicher Validierungslauf; die Paketierung ersetzt diese Prüfung nicht.
+Der Paketierer prüft DLL-Hash, das Vorhandensein der drei Szenariodateien, Lizenzdateien und Zielkonflikte vor dem Kopieren. Im Standardziel bleiben die vorhandenen Regelbytes einschließlich lokaler Szenarioanpassungen erhalten; für ein anderes Ziel werden sie kopiert. Er ergänzt DLL, Beispiel-CMD und Hinweise und schreibt ein Hashmanifest. Vorhandene fremde oder veränderte Zieldateien werden nicht still überschrieben. `--validation-root` wählt ausdrücklich andere Regelquellen, `--target` einen anderen Paketordner; die drei EXE-Pfade können ebenfalls ausdrücklich angegeben werden. Ob die Regeln einschließlich ihrer Importe verwendbar sind, prüft anschließend ein tatsächlicher Validierungslauf; die Paketierung ersetzt diese Prüfung nicht.
 
 Das erzeugte Paket dient zunächst der lokalen Prüfung. Die in [THIRD_PARTY.md](THIRD_PARTY.md) beschriebene Zuordnung des SaxonC-Quellcodes muss vor externer Binärweitergabe geklärt werden.
 

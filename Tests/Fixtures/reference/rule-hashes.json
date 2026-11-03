@@ -8,7 +8,7 @@
     "validator-configuration-xrechnung/3.0.2/EN16931-CII-validation.xslt": "7f7a5cbd00244024d8112cdfd448293f71291ffff18e94923e9950b6003621a8",
     "validator-configuration-xrechnung/3.0.2/EN16931-UBL-validation.xslt": "f0aea6eadb7f6975d6322e11dac7f2241a7c0edc1282732c6b17e0b4c470a0d9",
     "validator-configuration-xrechnung/3.0.2/README.md": "c003638bc2fe784cafe400050f5ab1cd7ac8df7ed785235def31631d47651967",
-    "validator-configuration-xrechnung/3.0.2/scenarios.xml": "109df0dbe443bf0dbdbccf8ceb0d90e05015b341db7b3f9b18ac23db32ce98e6",
+    "validator-configuration-xrechnung/3.0.2/scenarios.xml": "5604ebe89c76d7344dfbab1227cbf421b53f6bfa93d265b5645ef8b317f9800a",
     "validator-configuration-xrechnung/3.0.2/docs/usage.md": "0237fed633488b7c543031a9f8181dccd4cdf71e352afcaab1c0ea3e7231859e",
     "validator-configuration-xrechnung/3.0.2/resources/default-report.xsl": "16ef6b301d78aabae658163bbcba00d5bb6f948bd3180dadf231fd61b5ca24d4",
     "validator-configuration-xrechnung/3.0.2/resources/xrechnung-report.xsl": "d3bcea75b1dfa6665106ce096d9b14c6bcd0b8c359c4adcd4830c576d89ea7c0",
@@ -220,7 +220,7 @@
     "validator-configuration-zugferd/Schema/factur-x-1.09.2/4_Factur-X_1.09.2_EXTENDED/_XSLT_EXTENDED/FACTUR-X_EXTENDED.xslt": "52b44e77be20de05ee090eec0c4bbe69df239b608aefcaca2e24ffb1a0e50a6e",
     "validator-configuration-zugferd/Schema/factur-x-1.09.2/4_Factur-X_1.09.2_EXTENDED/_XSLT_EXTENDED/FACTUR-X_EXTENDED_codedb.xml": "6e23aedbba0e3b32b3b1211d145186193215f56f755201555306c42327e75fbc"
   },
-  "sha256": "6458bdbfa0f098ee23b2502b83e8e3d3d9b1f108d7c3e2f147c7eaa4be195ecd",
+  "sha256": "bb36f36779ca35bdde59b0586e2805d3e7f21b7a95ac78d466a5f7fc34df97e3",
   "configuration_versions": [
     "XRechnung 3.0.2, Schematron 2.3.0, EN16931 1.3.13",
     "ZUGFeRD 2.5.2 / Factur-X 1.09.2 und ZUGFeRD 1.0"

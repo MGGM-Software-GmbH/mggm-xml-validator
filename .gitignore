@@ -1,7 +1,9 @@
 Build/
 /Runtime/
 /Evidence/
-/build/
+!/build/
+/build/*
+!/build/Validation/
 /Tests/build/
 /Validation/
 /Vendor/

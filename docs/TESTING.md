@@ -15,7 +15,9 @@ Python-Prüfungen aus dem Projektverzeichnis:
 python -m unittest discover -s Tests
 ~~~
 
-Die Tests verwenden isolierte Verzeichnisse für Gegenproben. Sie prüfen Paketinhalt und Konflikte, Exportgrenzen, Berichtvergleich und eingebettete Ressourcen. Der Ressourcenvergleich benötigt weder DLL noch Regelpaket.
+Die Tests verwenden isolierte Verzeichnisse für Gegenproben. Sie prüfen Paketinhalt und Konflikte, Exportgrenzen, Berichtvergleich und eingebettete Ressourcen. Die mitgelieferten Regeln unter `build/Validation` werden zusätzlich gegen `rule-hashes.json` und auf vorhandene Szenarioressourcen geprüft. Der Export übernimmt diesen Regelpfad, verweigert dort Rechnungs-XML und Fremddateien und schließt andere Buildinhalte aus. Der Ressourcenvergleich benötigt weder DLL noch Regelpaket.
+
+Der [Prüfnachweis zum mitgelieferten Regelbestand](../Tests/bundled-validation-verification.json) dokumentiert 159 Python-Tests, die echte Paketierung aller 219 Regeldateien und je zehn öffentliche Referenzfälle mit den vorhandenen Delphi-11-/Delphi-13-CLIs. Geprüft werden insbesondere Factur-X-/EN16931-Zuordnung, unveränderte XRechnung-Zuordnung, Annahmeentscheidung und erwartete Fehlerbefunde. Die Szenarioanpassung erfordert keinen neuen Delphi-Build.
 
 Die Downloader-Tests benötigen `pwsh` oder `powershell.exe`. Sie führen den PowerShell-Helfer mit kleinen isolierten ZIP-Dateien aus und prüfen erfolgreiche Installation, Wiederholung, Hash-, Transport- und ZIP-Fehler sowie Zielkonflikte. Ohne PowerShell werden diese Fälle als übersprungen ausgewiesen. Die normalen Tests laden keine Herstellerdateien herunter. Ein echter Herstellerdownload ist separat zu prüfen; die native Windows-CMD-Ausführung ist durch einen Linux-PowerShell-Lauf nicht nachgewiesen.
 

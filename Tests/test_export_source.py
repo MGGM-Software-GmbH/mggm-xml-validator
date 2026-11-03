@@ -1,4 +1,4 @@
-"""Prüft den isolierten Quelleexport ohne Builddateien oder Git-Historie."""
+"""Prüft den Quelleexport mit technischen Regeln ohne Programme oder Git-Historie."""
 
 from pathlib import Path
 import subprocess
@@ -77,6 +77,77 @@ class SourceExportTests(unittest.TestCase):
         with self.listing(names):
             self.assertEqual(export_source.export_source(self.target), 1)
         self.assertEqual([path.name for path in self.target.rglob("*") if path.is_file()], ["README.md"])
+
+    def test_bundled_technical_rules_are_copied_byte_identically(self):
+        """Nur das vorgesehene Regelpaket unter build wird unverändert veröffentlicht."""
+        contents = {
+            "build/Validation/zugferd/scenarios.xml": b'<scenarios xmlns="urn:test">\r\n</scenarios>',
+            "build/Validation/xrechnung/codelist.xml": b'<codedb xmlns="urn:test"/>',
+            "build/Validation/xrechnung/schema.xsd": b"schema\r\n",
+            "build/Validation/xrechnung/validation.xsl": b"stylesheet\r\n",
+            "build/Validation/xrechnung/validation.xslt": b"stylesheet\r\n",
+            "build/Validation/xrechnung/validation.sch": b"schematron\r\n",
+            "build/Validation/xrechnung/validation.scmt": b"metadata\r\n",
+            "build/Validation/xrechnung/README.md": "Regelhinweise: äöüß\r\n".encode(),
+            "build/Validation/zugferd/LICENSE": b"license\r\n",
+            "build/Validation/zugferd/NOTICE": b"notice\r\n",
+        }
+        excluded = ["build/report.xml", "build/Reports/result.xml", "build/Other/schema.xsd",
+                    "build/ValidationExtra/schema.xsd", "Source/build/Validation/schema.xsd",
+                    "Build/Validation/schema.xsd", "build/validation/schema.xsd", "build/App.exe"]
+        for name, content in {**contents, **dict.fromkeys(excluded, b"generated")}.items():
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+        with self.listing([*contents, *excluded]):
+            self.assertEqual(export_source.export_source(self.target), len(contents))
+        for name, content in contents.items():
+            self.assertEqual((self.target / name).read_bytes(), content)
+        for name in excluded:
+            self.assertFalse((self.target / name).exists(), name)
+
+    def test_unexpected_bundled_files_are_rejected_before_creating_target(self):
+        """Programme, Archive, Rechnungen und weitere fremde Inhalte müssen auffallen."""
+        cases = {
+            "application.exe": b"MZ executable",
+            "library.dll": b"MZ library",
+            "archive.zip": b"PK archive",
+            "compiled.dcu": b"compiler output",
+            "report.json": b"{}",
+            "reference.xlsx": b"PK spreadsheet",
+            "invoice.xml": b'<Invoice xmlns="urn:invoice"/>',
+            "broken.xml": b"<scenarios>",
+        }
+        for name, content in cases.items():
+            with self.subTest(name=name):
+                path = self.root / "build/Validation" / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(content)
+                with self.listing([path.relative_to(self.root).as_posix()]), self.assertRaises(ValueError):
+                    export_source.export_source(self.target)
+                self.assertFalse(self.target.exists())
+                path.unlink()
+
+    def test_internal_symlink_in_bundled_rules_is_rejected(self):
+        """Auch interne Links im technischen Regelpaket dürfen nicht exportiert werden."""
+        source = self.root / "build/Validation/actual/schema.xsd"
+        source.parent.mkdir(parents=True)
+        source.write_bytes(b"schema")
+        (source.parent.parent / "linked").symlink_to(source.parent, target_is_directory=True)
+        with self.listing(["build/Validation/linked/schema.xsd"]), self.assertRaisesRegex(ValueError, "Verweis"):
+            export_source.export_source(self.target)
+        self.assertFalse(self.target.exists())
+
+    def test_external_symlink_for_bundled_rules_is_rejected(self):
+        """Die Build-Ausnahme darf keine externen Regelverzeichnisse einschließen."""
+        outside = self.root.parent / "external-rules"
+        outside.mkdir()
+        (outside / "schema.xsd").write_bytes(b"external schema")
+        (self.root / "build").mkdir()
+        (self.root / "build/Validation").symlink_to(outside, target_is_directory=True)
+        with self.listing(["build/Validation/schema.xsd"]), self.assertRaisesRegex(ValueError, "Verweis"):
+            export_source.export_source(self.target)
+        self.assertFalse(self.target.exists())
 
     def test_linked_source_ancestor_outside_root_is_rejected(self):
         """Ein indexierter Unterpfad darf nach einem Verzeichnislink keine externen Daten exportieren."""

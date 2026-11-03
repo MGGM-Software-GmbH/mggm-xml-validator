@@ -5,6 +5,8 @@ from pathlib import Path
 import shutil
 import subprocess
 
+from package_runtime import add_tree
+
 
 ROOT = Path(__file__).resolve().parent
 SOURCE_DIRECTORIES = {"Source", "Examples", "Tests", "ThirdParty", "docs"}
@@ -36,7 +38,7 @@ def validate_source(root, relative):
 
 
 def export_source(target):
-    """Ein neues Ziel enthält weder Laufzeitpakete noch die übergeordnete Historie."""
+    """Ein neues Ziel enthält Quellen und technische Regeln ohne Programme oder Historie."""
     root = ROOT.resolve()
     target = target.resolve()
     if target == root or target.is_relative_to(root):
@@ -48,12 +50,27 @@ def export_source(target):
         cwd=root, check=True, stdout=subprocess.PIPE,
     )
     files = []
+    bundled_rules = None
     for name in listing.stdout.decode("utf-8").split("\0"):
         if not name:
             continue
         relative = Path(name)
         if relative.is_absolute() or ".." in relative.parts:
             raise ValueError("Ungültiger Quellpfad: " + name)
+        if relative.parts[:2] == ("build", "Validation"):
+            source = validate_source(root, relative)
+            if not source.exists():
+                continue
+            if bundled_rules is None:
+                bundled_rules = {}
+                try:
+                    add_tree(bundled_rules, root / "build/Validation", Path("build/Validation"), rules=True)
+                except SystemExit as error:
+                    raise ValueError(str(error)) from error
+            if relative.as_posix() not in bundled_rules:
+                raise ValueError("Unerwartete Datei im technischen Regelpaket: " + name)
+            files.append(relative)
+            continue
         if any(part.lower() in GENERATED_DIRECTORIES for part in relative.parts):
             continue
         if relative.suffix.lower() in GENERATED_SUFFIXES:

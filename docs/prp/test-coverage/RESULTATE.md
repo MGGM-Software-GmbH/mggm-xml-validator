@@ -32,9 +32,9 @@ FeRD-Beispiele. Es werden keine privaten Rechnungen verwendet.
 `rule-hashes.json` bindet 219 lokale Regeldateien: XRechnung 3.0.2 mit Schematron 2.3.0
 und EN16931 1.3.13 sowie ZUGFeRD 2.5.2 / Factur-X 1.09.2 und ZUGFeRD 1.0.
 Der SHA-256 der geordneten Regeldateizuordnung ist
-`6458bdbfa0f098ee23b2502b83e8e3d3d9b1f108d7c3e2f147c7eaa4be195ecd`.
-JAR, Regeln und native DLL sind lokale Voraussetzungen und werden nicht als
-Bestandteile des Fixture-Verzeichnisses ausgegeben.
+`bb36f36779ca35bdde59b0586e2805d3e7f21b7a95ac78d466a5f7fc34df97e3`.
+Die Regeln liegen unter `build/Validation`; Java-JAR und native DLL werden separat
+bereitgestellt. Sie sind keine Bestandteile des Fixture-Verzeichnisses.
 
 ## Ausgewählter Referenzlauf
 
@@ -81,7 +81,7 @@ Die aktuellen Build-IDs, Lauf-IDs und Datei-Hashes stehen im
 | ParallelEngineTests | 16 Aufrufe, 8 überlappende Runden | 16 Aufrufe, 8 überlappende Runden |
 | DelphiExampleTests | 17/17 | 17/17 |
 
-Die Python-Suite besteht 151/151 Tests. Sie prüft unter anderem die Inventur,
+Die Python-Suite besteht 159/159 Tests. Sie prüft unter anderem die Inventur,
 Fixture- und Regelbindung, Gegenproben des Berichtvergleichs, Ressourcen,
 Paketierung und Exportgrenzen. Server-, Daemon- und HTTP-Endpunkttests wurden
 nicht übernommen.

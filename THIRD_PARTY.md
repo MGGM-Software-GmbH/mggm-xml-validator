@@ -18,7 +18,7 @@ MPL 2.0, Abschnitt 3.2, verlangt bei Binärweitergabe die Verfügbarkeit des zug
 
 ## Prüfregeln
 
-Die drei verwendeten Konfigurationen und ihre technischen Abhängigkeiten bleiben unverändert. Das Laufzeitpaket enthält die Regeln unter `Validation` und die zusätzlichen Lizenzhinweise unter `Notices/Validation`. Die Herkunft ist in [ThirdParty/Validation/SOURCES.md](ThirdParty/Validation/SOURCES.md) dokumentiert.
+Die drei verwendeten Konfigurationen und ihre technischen Abhängigkeiten sind unter `build/Validation` versioniert. Die XRechnung-Szenariodatei enthält eine kommentierte Anpassung zur EN16931-/Factur-X-Zuordnung; die übrigen Regeldateien werden mit ihren Originalbytes und Hinweisen übernommen. Die zusätzlichen Lizenzhinweise liegen im Quellrepository unter `ThirdParty/Validation` und im paketierten Laufzeitverzeichnis unter `Notices/Validation`. Herkunft und Anpassung sind in [ThirdParty/Validation/SOURCES.md](ThirdParty/Validation/SOURCES.md) dokumentiert.
 
 Die Zusammenstellung [validator-configuration-zugferd](https://github.com/LandrixSoftware/validator-configuration-zugferd) wurde von MGGM Software GmbH mitentwickelt und wird im Repository von Landrix Software gepflegt. Sie ergänzt die XRechnung-Konfiguration um die Prüfung der XML-Daten von ZUGFeRD-/Factur-X-E-Rechnungen. Dieselben Regeln können auch mit dem Original-KoSIT-Validator verwendet werden. Der gemeinsame Autorenhinweis steht in den Szenariodateien; die Herkunft der zugrunde liegenden Standardartefakte und deren Lizenzbedingungen bleiben davon unberührt.
 
@@ -35,7 +35,7 @@ Die beiden inhaltlich unveränderten XRechnung-Beispiele unter `Tests/Fixtures/r
 
 Die vier abgeleiteten Rechnungen kennzeichnen ihre Änderungen im XML. Die ZUGFeRD-/Factur-X-Fälle sind Ableitungen des CII-Beispiels für das angegebene EN16931-/Comfort-Szenario, keine offiziellen FeRD-Beispiele. Vier zusätzliche synthetische Parser- und Szenariofälle unterliegen der Projektlizenz. Die [Fixture-Dokumentation](Tests/Fixtures/reference/README.md) beschreibt die Herkunft und den jeweiligen Zweck. Private Rechnungsdaten werden für diesen Korpus nicht verwendet.
 
-Die im Referenzlauf benötigten Regeln und das Java-JAR werden lokal bereitgestellt. Die Versions- und Hashbindung ersetzt ihre jeweiligen Lizenzbedingungen nicht; beide sind kein Bestandteil des versionierten Fixture-Verzeichnisses.
+Die Regeln für den Referenzlauf sind unter `build/Validation` enthalten; das Java-JAR wird separat lokal bereitgestellt. Die Versions- und Hashbindung ersetzt ihre jeweiligen Lizenzbedingungen nicht; beide sind kein Bestandteil des versionierten Fixture-Verzeichnisses.
 
 ## Betriebssystem und Compiler
 

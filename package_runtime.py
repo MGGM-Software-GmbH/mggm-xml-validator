@@ -119,7 +119,7 @@ def package(argv=None):
     parser.add_argument("--batch-executable", type=Path, default=ROOT / "build/MGGMXmlValidatorBatch.exe")
     parser.add_argument("--example-executable", type=Path, default=ROOT / "build/ValidateXmlExample.exe")
     parser.add_argument("--sdk", type=Path, default=ROOT / "Vendor/SaxonC")
-    parser.add_argument("--validation-root", type=Path, default=ROOT / "Validation")
+    parser.add_argument("--validation-root", type=Path, default=ROOT / "build/Validation")
     parser.add_argument("--target", type=Path, default=ROOT / "build")
     args = parser.parse_args(argv)
     target = args.target.absolute()
@@ -155,7 +155,10 @@ def package(argv=None):
         sources["Notices/" + name] = ROOT / name
     for name in ("validator-configuration-zugferd", "validator-configuration-xrechnung/3.0.2"):
         source = args.validation_root / name
-        if target.resolve().is_relative_to(source.resolve()) or source.resolve().is_relative_to(target.resolve()):
+        # Die versionierten Regeln liegen im Standardziel bereits an ihrem Laufzeitpfad.
+        # Diese Dateien werden eingefroren und gehasht, ohne Benutzeränderungen zu ersetzen.
+        in_place = source.resolve() == (target / "Validation" / name).resolve()
+        if not in_place and (target.resolve().is_relative_to(source.resolve()) or source.resolve().is_relative_to(target.resolve())):
             raise SystemExit("Regelquelle und Laufzeitziel dürfen sich nicht überlappen.")
         add_tree(sources, source, Path("Validation") / name, rules=True)
     for source in sources.values():

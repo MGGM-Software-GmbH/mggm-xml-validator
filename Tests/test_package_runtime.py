@@ -4,6 +4,7 @@ from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import unittest
@@ -69,7 +70,7 @@ class RuntimePackageTests(unittest.TestCase):
     def run_package(self, *arguments):
         """Standardpfade und ausdrücklich übergebene Varianten gleichermaßen prüfen."""
         with redirect_stdout(io.StringIO()):
-            package_runtime.package(["--sdk", str(self.sdk), *arguments])
+            package_runtime.package(["--sdk", str(self.sdk), "--validation-root", str(self.validation_root), *arguments])
 
     def snapshot(self):
         """Vorprüfungsfehler dürfen den bestehenden Buildinhalt nicht verändern."""
@@ -78,10 +79,25 @@ class RuntimePackageTests(unittest.TestCase):
 
     def test_standalone_repository_defaults_without_arguments(self):
         """Der dokumentierte Aufbau benötigt keine benachbarten Entwicklungsprojekte."""
+        shutil.copytree(self.validation_root, self.output / "Validation")
+        self.validation_root.rename(self.root / "external-rules-unavailable")
         with redirect_stdout(io.StringIO()):
             package_runtime.package([])
         self.assertEqual((self.output / "saxonc-core-he.dll").read_bytes(), self.library.read_bytes())
         self.assertTrue((self.output / "Validation" / package_runtime.SCENARIOS[2]).is_file())
+
+    def test_bundled_rule_changes_are_preserved_and_manifested_in_place(self):
+        """Szenarioanpassungen im versionierten Buildpfad bleiben auch bei erneuter Paketierung erhalten."""
+        bundled = self.output / "Validation"
+        shutil.copytree(self.validation_root, bundled)
+        self.run_package("--validation-root", str(bundled))
+        scenario = bundled / package_runtime.SCENARIOS[2]
+        scenario.write_bytes(b"<scenarios><name>custom-profile</name></scenarios>")
+        expected = {path.relative_to(bundled): path.read_bytes() for path in bundled.rglob("*") if path.is_file()}
+        self.run_package("--validation-root", str(bundled))
+        self.assertEqual(expected, {path.relative_to(bundled): path.read_bytes() for path in bundled.rglob("*") if path.is_file()})
+        manifest = json.loads((self.output / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["files"]["Validation/" + package_runtime.SCENARIOS[2]], package_runtime.digest(scenario))
 
     def test_all_programs_rules_and_hashes_are_packaged(self):
         """Alle Programme, Regeldateien und Lizenztexte gehören zum Manifest."""
